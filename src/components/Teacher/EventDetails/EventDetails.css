@@ -1,0 +1,30 @@
+.event-details {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.event-details h1 {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.event-description h2, .event-description h3 {
+    margin-top: 20px;
+}
+
+.event-description ul {
+    list-style-type: square;
+    margin-left: 20px;
+}
+
+.speakers ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+.loading, .error {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 1.5em;
+    color: red;
+}

@@ -1,0 +1,60 @@
+src/
+├── components/
+│   ├── Admin/
+│   │   ├── Dashboard/
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Dashboard.css
+│   │   │   └── Dashboard.test.js
+│   │   ├── ManageUsers/
+│   │   │   ├── ManageUsers.jsx
+│   │   │   ├── ManageUsers.css
+│   │   │   └── ManageUsers.test.js
+│   │   ├── ManageEvents/
+│   │   │   ├── ManageEvents.jsx
+│   │   │   ├── ManageEvents.css
+│   │   │   └── ManageEvents.test.js
+│   │   └── Reports/
+│   │       ├── Reports.jsx
+│   │       ├── Reports.css
+│   │       └── Reports.test.js
+│   ├── Teacher/
+│   │   ├── Attendance/
+│   │   │   ├── Attendance.jsx
+│   │   │   ├── Attendance.css
+│   │   │   └── Attendance.test.js
+│   │   ├── Classroom/
+│   │   │   ├── Classroom.jsx
+│   │   │   ├── Classroom.css
+│   │   │   └── Classroom.test.js
+│   │   ├── Events/
+│   │   │   ├── Events.jsx
+│   │   │   ├── Events.css
+│   │   │   └── Events.test.js
+│   │   └── SharedFiles/
+│   │       ├── SharedFiles.jsx
+│   │       ├── SharedFiles.css
+│   │       └── SharedFiles.test.js
+│   └── Common/
+│       ├── Header.jsx
+│       ├── Sidebar.jsx
+│       ├── Footer.jsx
+│       ├── Notification.jsx
+│       └── Loader.jsx
+├── pages/
+│   ├── AdminDashboard.jsx
+│   ├── TeacherDashboard.jsx
+│   ├── UserForm.jsx
+│   └── ErrorPage.jsx
+├── services/
+│   ├── api.js
+│   ├── auth.js
+│   └── fileService.js
+├── utils/
+│   ├── constants.js
+│   ├── helpers.js
+│   └── validators.js
+├── App.js
+├── index.js
+├── App.css
+├── index.css
+└── package.json

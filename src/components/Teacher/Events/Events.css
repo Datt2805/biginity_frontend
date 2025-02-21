@@ -1,0 +1,96 @@
+/* Card container to center the cards */
+.card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center cards horizontally */
+  gap: 24px; /* Space between cards */
+  padding: 20px;
+}
+
+/* Card styling */
+.card {
+  background-color: white;
+  width: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  padding: 32px;
+  border-radius: 18px;
+  border: 2px solid var(--primary-color);
+  transition: all 0.3s ease-in-out;
+  margin: 0 auto; /* Ensure card is centered */
+}
+
+.card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+}
+
+.card img {
+  width: 280px;
+  height: auto;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.card .card-content {
+  width: 230px;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.card .card-content h3 {
+  font-size: 24px;
+  text-transform: uppercase;
+  color: rgb(43, 50, 43);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.card .card-content p {
+  font-size: 16px;
+  line-height: 1.5;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.card .card-content p span {
+  font-size: 16px;
+  color: var(--primary-color);
+}
+
+.card .card-content p span:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .card-container {
+    gap: 16px; /* Reduce gap between cards on smaller screens */
+  }
+
+  .card {
+    flex-direction: column;
+    width: 90%;
+    padding: 16px;
+  }
+
+  .card img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 16px;
+  }
+
+  .card .card-content {
+    width: 100%;
+    height: auto;
+  }
+}

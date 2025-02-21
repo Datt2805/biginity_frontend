@@ -1,0 +1,110 @@
+/* General styles for the classroom page */
+.classrooms {
+  font-family: 'Arial', sans-serif;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f9f9f9;
+}
+
+.classrooms h2 {
+  font-size: 32px;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.classroom-item {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 10px 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.classroom-item:hover {
+  transform: scale(1.05);
+}
+
+.classroom-item h3 {
+  font-size: 24px;
+  color: #333;
+}
+
+.classroom-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.classroom-buttons button {
+  padding: 8px 16px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Button styling for Start Attendance, Punch In, and Punch Out */
+.classroom-buttons button:hover {
+  transform: scale(1.05);
+}
+
+.classroom-buttons button:focus {
+  outline: none;
+}
+
+.classroom-buttons button:first-child {
+  background-color: #007bff;
+  color: white;
+}
+
+.classroom-buttons button:first-child:hover {
+  background-color: #0056b3;
+}
+
+.classroom-buttons button:nth-child(2) {
+  background-color: #28a745;
+  color: white;
+}
+
+.classroom-buttons button:nth-child(2):hover {
+  background-color: #218838;
+}
+
+.classroom-buttons button:nth-child(3) {
+  background-color: #dc3545;
+  color: white;
+}
+
+.classroom-buttons button:nth-child(3):hover {
+  background-color: #c82333;
+}
+
+.error {
+  color: red;
+  font-size: 18px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+  .classrooms {
+    padding: 10px;
+  }
+
+  .classroom-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .classroom-buttons {
+    width: 100%;
+    justify-content: space-evenly;
+  }
+}

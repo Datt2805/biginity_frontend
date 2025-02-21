@@ -1,0 +1,18 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .header, .sidebar, .notification {
+    padding: 10px;
+  }
+  
+  .notification {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: #ddd;
+    padding: 10px;
+  }
+  
