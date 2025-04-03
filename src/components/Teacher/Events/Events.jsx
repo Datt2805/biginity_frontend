@@ -5,6 +5,7 @@ import axios from "axios";
 import { hostSocket, handleEnroll, fetchUserDetail } from '../../../services/api';
 import { USER_ROLES } from "../../../types";
 import "./Events.css";
+import defaultPlaceholder from "../../../public/image.png";
 
 const handleEnrollClick = async (event, id) => {
     event.preventDefault();
@@ -30,7 +31,7 @@ const EventCard = ({ id, heading, date, location, img, userRole }) => {
                     <img
                         src={img}
                         alt={heading}
-                        onError={(e) => (e.target.src = "/default-placeholder.jpg")} // Fallback image
+                        onError={(e) => (e.target.src = defaultPlaceholder)} // Fallback image
                     />
                 </div>
 
@@ -63,11 +64,15 @@ const EventsList = () => {
         const fetchEvents = async () => {
             try {
                 const response = await axios.get(`${hostSocket}/api/events`);
-                console.log("API Response:", response.data);
-                if (Array.isArray(response.data.events)) {
-                    setEvents(response.data.events);
+                // console.log("API Response:", response.data); // Debugging
+
+                // Check if response is an array or contains an events array
+                if (Array.isArray(response.data)) {
+                    setEvents(response.data); // Case where response is already an array
+                } else if (response.data && Array.isArray(response.data.events)) {
+                    setEvents(response.data.events); // Normal expected case
                 } else {
-                    console.error("Expected an array but got:", response.data.events);
+                    console.error("Expected an array but got:", response.data);
                     setError("Failed to load events");
                 }
             } catch (error) {
@@ -76,6 +81,7 @@ const EventsList = () => {
             }
         };
 
+
         loadUserRole();
         fetchEvents();
     }, []);
@@ -83,29 +89,34 @@ const EventsList = () => {
     return (
         <div className="events-list">
             {Array.isArray(events) && events.length > 0 ? (
-                events.map((event) => {
-                    const startTime = new Date(event.start_time);
-                    return (
-                        <EventCard
-                            key={event._id}
-                            id={event._id}
-                            heading={event.title}
-                            date={{
-                                year: startTime.getFullYear(),
-                                month: startTime.getMonth() + 1,
-                            }}
-                            location={event.location.address}
-                            img={event.image ? `${hostSocket}${event.image}` : "/default-placeholder.jpg"} // Ensuring full URL
-                            userRole={userRole}
-                        />
+                events
+    .filter(event => event && event._id && event.title)
+    .map((event) => {
+        const imageUrl = event?.image ? `${hostSocket}${event.image}` : "/default-placeholder.jpg";
+        {/* console.log("Image URL for Event:", event.title, imageUrl); // Debugging */}
 
-                    );
-                })
+        return (
+            <EventCard
+                key={event._id}
+                id={event._id}
+                heading={event.title}
+                date={{
+                    year: new Date(event.start_time)?.getFullYear() || "N/A",
+                    month: new Date(event.start_time)?.getMonth() + 1 || "N/A",
+                }}
+                location={event?.location?.address || "Unknown"}
+                img={imageUrl}
+                userRole={userRole}
+            />
+        );
+    })
+
             ) : (
                 <div>No events available</div>
             )}
         </div>
     );
+    
 };
 
 export default EventsList;

@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from 'react';
 import './Attendance.css';
-import { makeSecureRequest } from '../../../services/api';
+import { makeSecureRequest, hostSocket } from '../../../services/api';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -24,17 +24,14 @@ const ViewAttendancePage = () => {
   // Fetch Event Data
   const fetchEventData = async () => {
     try {
-      const response = await makeSecureRequest(`/api/events`, "GET", {});
-      
-      if (!response || !response.data || !Array.isArray(response.data.events)) {
-        throw new Error("Invalid event data format");
+      const response = await fetch(`${hostSocket}/api/events`);
+      const data = await response.json();
+      if (!data || !data.events) {
+        throw new Error("Invalid data format");
       }
-  
-      console.log("Fetched Events:", response.data.events); // Debugging
-      setEventData(response.data.events);
-    } catch (err) {
-      console.error("Error fetching events:", err.message || err);
-      setEventData([]); // Set empty array to prevent undefined issues
+      setEventData(data.events);
+    } catch (error) {
+      console.error("Error fetching events:", error);
     }
   };
   
@@ -44,8 +41,9 @@ const ViewAttendancePage = () => {
     try {
       setLoading(true);
       const response = await makeSecureRequest(`/api/attendances`, "GET", {});
-      console.log("Fetched Attendance:", response.data); // Debugging
-      setAttendanceData(response.data || []);
+      // console.log("Fetched Attendance:", response.data); // Debugging
+      const sortedData = (response.data || []).sort((a, b) => new Date(b.punch_in_time) - new Date(a.punch_in_time));
+      setAttendanceData(sortedData);
     } catch (err) {
       setError(err.message || 'An error occurred while fetching attendance data');
     } finally {
@@ -124,22 +122,27 @@ const ViewAttendancePage = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((record) => (
-              <tr key={record._id}>
-                <td>{getEventName(record.event_id)}</td> {/* Get Event Name */}
-                <td>{record.name}</td>
-                <td>{record.nickname}</td>
-                <td>{record.enrollment_id}</td>
-                <td>{record.branch}</td>
-                <td>{record.stream}</td>
-                <td>{record.year}</td>
-                <td>{record.status}</td>
-                <td>{record.punch_in_time ? new Date(record.punch_in_time).toLocaleString() : 'N/A'}</td>
-                <td>{record.punch_out_time ? new Date(record.punch_out_time).toLocaleString() : 'N/A'}</td>
-                <td>{record.locations?.length > 0 ? `${record.locations[0].lat}, ${record.locations[0].long}` : 'N/A'}</td>
-              </tr>
-            ))}
-          </tbody>
+  {paginatedData.map((record) => (
+    <tr key={record._id}>
+      <td>{getEventName(record.event_id)}</td>
+      <td>{record.name}</td>
+      <td>{record.nickname}</td>
+      <td>{record.enrollment_id}</td>
+      <td>{record.branch}</td>
+      <td>{record.stream}</td>
+      <td>{record.year}</td>
+      <td>{record.status}</td>
+      <td>{record.punch_in_time ? new Date(record.punch_in_time).toLocaleString() : 'N/A'}</td>
+      <td>{record.punch_out_time ? new Date(record.punch_out_time).toLocaleString() : 'N/A'}</td>
+      <td>
+        {record.locations?.length > 0
+          ? `${record.locations[0].lat}, ${record.locations[0].long}`
+          : 'N/A'}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
         </table>
       ) : (
         <p>No attendance records found.</p>

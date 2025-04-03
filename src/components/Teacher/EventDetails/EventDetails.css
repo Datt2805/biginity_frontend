@@ -36,6 +36,17 @@
     margin-bottom: 5px;
 }
 
+/* ✅ Image Styling - Makes images smaller */
+.event-details img {
+    max-width: 100%; /* Ensures responsiveness */
+    width: 250px; /* Set a smaller default width */
+    height: auto; /* Maintains aspect ratio */
+    display: block;
+    margin: 10px auto; /* Center aligns */
+    border-radius: 6px; /* Optional: smooth edges */
+    object-fit: contain; /* Ensures full image is visible */
+}
+
 .error {
     color: red;
     font-weight: bold;
@@ -49,6 +60,7 @@
     color: #555;
 }
 
+/* ✅ Responsive adjustments for small screens */
 @media (max-width: 600px) {
     .event-details {
         padding: 15px;
@@ -58,5 +70,8 @@
     }
     .event-details p, .event-details ul li {
         font-size: 14px;
+    }
+    .event-details img {
+        width: 180px; /* Further reduce image size on small screens */
     }
 }
