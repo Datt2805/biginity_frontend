@@ -7,6 +7,7 @@ const ITEMS_PER_PAGE = 5;
 
 const ViewAttendancePage = () => {
   const [attendanceData, setAttendanceData] = useState([]);
+  const [eventData, setEventData] = useState([]); // Store event details
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -16,14 +17,34 @@ const ViewAttendancePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
+    fetchEventData();
     fetchAttendanceData();
   }, []);
 
+  // Fetch Event Data
+  const fetchEventData = async () => {
+    try {
+      const response = await makeSecureRequest(`/api/events`, "GET", {});
+      
+      if (!response || !response.data || !Array.isArray(response.data.events)) {
+        throw new Error("Invalid event data format");
+      }
+  
+      console.log("Fetched Events:", response.data.events); // Debugging
+      setEventData(response.data.events);
+    } catch (err) {
+      console.error("Error fetching events:", err.message || err);
+      setEventData([]); // Set empty array to prevent undefined issues
+    }
+  };
+  
+
+  // Fetch Attendance Data
   const fetchAttendanceData = async () => {
     try {
       setLoading(true);
       const response = await makeSecureRequest(`/api/attendances`, "GET", {});
-      console.log("Fetched Data:", response.data);  // Debugging line
+      console.log("Fetched Attendance:", response.data); // Debugging
       setAttendanceData(response.data || []);
     } catch (err) {
       setError(err.message || 'An error occurred while fetching attendance data');
@@ -34,6 +55,12 @@ const ViewAttendancePage = () => {
 
   const handlePageChange = (direction) => {
     setCurrentPage((prevPage) => prevPage + direction);
+  };
+
+  // Function to get event name from event ID
+  const getEventName = (eventId) => {
+    const event = eventData.find(e => e._id === eventId);
+    return event ? event.title : "N/A"; // Return event name or "N/A" if not found
   };
 
   // Apply Filters
@@ -83,14 +110,12 @@ const ViewAttendancePage = () => {
         <table className="attendance-table">
           <thead>
             <tr>
-              <th>Classroom ID</th>
-              <th>Event ID</th>
+              <th>Event Name</th>
               <th>Name</th>
               <th>Nickname</th>
               <th>Enrollment ID</th>
               <th>Branch</th>
               <th>Stream</th>
-              <th>Gender</th>
               <th>Year</th>
               <th>Status</th>
               <th>Punch In</th>
@@ -101,14 +126,12 @@ const ViewAttendancePage = () => {
           <tbody>
             {paginatedData.map((record) => (
               <tr key={record._id}>
-                <td>{record.classroom_id}</td>
-                <td>{record.event_id || "N/A"}</td>
+                <td>{getEventName(record.event_id)}</td> {/* Get Event Name */}
                 <td>{record.name}</td>
                 <td>{record.nickname}</td>
                 <td>{record.enrollment_id}</td>
                 <td>{record.branch}</td>
                 <td>{record.stream}</td>
-                <td>{record.gender}</td>
                 <td>{record.year}</td>
                 <td>{record.status}</td>
                 <td>{record.punch_in_time ? new Date(record.punch_in_time).toLocaleString() : 'N/A'}</td>

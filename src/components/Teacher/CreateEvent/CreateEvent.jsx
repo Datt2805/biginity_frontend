@@ -36,7 +36,7 @@ const CreateEvent = () => {
       <form id="createEvent" onSubmit={handleSubmit}>
         {/* Mandatory Field */}
         <label>
-          <input type="checkbox" name="mandatory" /> Mandatory
+          <input type="checkbox" name="mandatory" defaultChecked /> Mandatory
         </label>
 
         {/* Title */}

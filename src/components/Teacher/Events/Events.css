@@ -1,9 +1,15 @@
-/* Card container to center the cards */
+/* Global Font Styles */
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #2b323b;
+}
+
+/* Container for cards */
 .card-container {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center cards horizontally */
-  gap: 24px; /* Space between cards */
+  align-items: center;
+  gap: 24px;
   padding: 20px;
 }
 
@@ -12,85 +18,125 @@
   background-color: white;
   width: 600px;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 24px;
-  padding: 32px;
-  border-radius: 18px;
+  padding: 28px;
+  border-radius: 16px;
   border: 2px solid var(--primary-color);
-  transition: all 0.3s ease-in-out;
-  margin: 0 auto; /* Ensure card is centered */
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  margin: 0 auto;
+  margin-top: 10px;
 }
 
 .card:hover {
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px);
+}
+
+/* Image Styling */
+.card-img-wrapper {
+  flex-shrink: 0;
 }
 
 .card img {
-  width: 280px;
-  height: auto;
+  width: 260px;
+  height: 180px;
   border-radius: 14px;
   object-fit: cover;
 }
 
-.card .card-content {
-  width: 230px;
-  height: 180px;
+/* Card Content */
+.card-content {
+  width: 260px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
 }
 
-.card .card-content h3 {
-  font-size: 24px;
+/* Heading Style */
+.card-content h3 {
+  font-size: 22px;
   text-transform: uppercase;
-  color: rgb(43, 50, 43);
-  font-weight: 600;
-  margin-bottom: 12px;
+  color: #2b323b;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
 }
 
-.card .card-content p {
+/* Paragraph Text */
+.card-content p {
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.6;
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 18px;
-  color: rgba(0, 0, 0, 0.7);
+  margin-top: 12px;
+  color: rgba(0, 0, 0, 0.75);
+  font-weight: 500;
 }
 
-.card .card-content p span {
+/* Highlighted Text */
+.card-content p span {
   font-size: 16px;
+  font-weight: 600;
   color: var(--primary-color);
+  text-decoration: none; /* Removed underline */
 }
 
-.card .card-content p span:hover {
-  text-decoration: underline;
+.card-content p span:hover {
+  text-decoration: none; /* Ensuring no underline on hover */
+}
+
+/* Enroll Button */
+button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+button:hover {
+  background-color: var(--primary-dark-color);
+  transform: scale(1.05);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .card-container {
-    gap: 16px; /* Reduce gap between cards on smaller screens */
-  }
-
   .card {
     flex-direction: column;
     width: 90%;
-    padding: 16px;
+    padding: 18px;
+    gap: 16px;
   }
 
   .card img {
     width: 100%;
     height: auto;
-    margin-bottom: 16px;
   }
 
-  .card .card-content {
+  .card-content {
     width: 100%;
-    height: auto;
+    text-align: center;
+  }
+
+  .card-content h3 {
+    font-size: 20px;
+  }
+
+  .card-content p {
+    font-size: 15px;
+  }
+
+  button {
+    width: 100%;
+    text-align: center;
   }
 }
