@@ -53,33 +53,141 @@ export const fetchClassrooms = async () => await makeSecureRequest("/api/classro
 export const fetchEvents = async () => await makeSecureRequest("/api/events", "GET");
 
 // Function to create an event
-export async function createEvent(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target, e.submitter);
+// export async function createEvent(e) {
+//     e.preventDefault();
+//     const formData = new FormData(e.target, e.submitter);
 
-    const eventJson = {
-        mandatory: formData.get("mandatory") === "on",
-        title: formData.get("title"),
-        description: {
-            objectives: formData.get("objectives").split("\n"),
-            learning_outcomes: formData.get("learning_outcomes").split("\n"),
-        },
-        start_time: new Date(formData.get("start_time")).toISOString(),
-        end_time: new Date(formData.get("end_time")).toISOString(),
-        location: {
-            address: formData.get("address"),
-            lat: parseFloat(formData.get("lat")) || null,
-            long: parseFloat(formData.get("long")) || null,
-        },
-        speaker_ids: formData?.get("speaker_ids")?.split(",").map(id => id.trim()),
-    };
+//     const eventJson = {
+//         mandatory: formData.get("mandatory") === "on",
+//         title: formData.get("title"),
+//         description: {
+//             objectives: formData.get("objectives").split("\n"),
+//             learning_outcomes: formData.get("learning_outcomes").split("\n"),
+//         },
+//         start_time: new Date(formData.get("start_time")).toISOString(),
+//         end_time: new Date(formData.get("end_time")).toISOString(),
+//         location: {
+//             address: formData.get("address"),
+//             lat: parseFloat(formData.get("lat")) || null,
+//             long: parseFloat(formData.get("long")) || null,
+//         },
+//         speaker_ids: formData?.get("speaker_ids")?.split(",").map(id => id.trim()),
+//     };
 
-    try {
-        const data = await makeSecureRequest("/api/events", "POST", eventJson);
-        console.log("Event created:", data);
-    } catch (error) {
-        console.log(error.message);
-    }
+//     try {
+//         const data = await makeSecureRequest("/api/events", "POST", eventJson);
+//         console.log("Event created:", data);
+//     } catch (error) {
+//         console.log(error.message);
+//     }
+// }
+export async function createEvent(e, successCallback=(data)=>{console.log(data)}, errorCallback=(error)=>console.error(error)) {
+	e.preventDefault(); // Prevent the default form submission
+
+	// Create a JSON object based on the schema
+	const formData = new FormData(e.target, e.submitter);
+	const eventJson = {
+		mandatory: formData.get("mandatory") === "on",
+		title: formData.get("title"),
+		description: {
+			detail: formData.get('detail'),
+			objectives: formData.get("objectives").split("\n"), // Split by line for multiple objectives
+			learning_outcomes: formData.get("learning_outcomes").split("\n"), // Split by line for multiple outcomes
+		},
+		start_time: new Date(formData.get("start_time")).toISOString(),
+		end_time: new Date(formData.get("end_time")).toISOString(),
+		location: {
+			address: formData.get("address"),
+			lat: parseFloat(formData.get("lat")) || null,
+			long: parseFloat(formData.get("long")) || null,
+		},
+		speaker_ids: formData
+			?.get("speaker_ids")
+			?.split(",")
+			.map((id) => id.trim()), // Split by comma for multiple IDs
+	};
+	console.group('createEvent')
+	// Log the JSON object to the console
+	console.log(JSON.stringify(eventJson, null, 2)); // Pretty-print JSON
+
+	try {
+		const data = await makeSecureRequest(`${hostSocket}/api/events`, 'POST', eventJson)
+		successCallback(data)
+	} catch (error) {
+		errorCallback(error)
+	} finally {
+		console.groupEnd();
+	}
+}
+createEvent.handler=(successCallback, errorCallback)=>{
+	return function (event){
+		createEvent(event, successCallback, errorCallback)
+	}
+}
+
+// File upload function
+// export async function uploadFile(event, successCallback = console.log, errorCallback = console.error) {
+//     event.preventDefault();
+//     const formData = new FormData(event.target, event.submitter);
+
+//     try {
+//         const token = getItemWithExpiry("token");
+//         if (!token) throw new Error("Log in/Register to perform this action");
+
+//         const response = await fetch(`${hostSocket}/file/upload/`, {
+//             method: "POST",
+//             headers: { Authorization: `Bearer ${token}` },
+//             body: formData,
+//         });
+
+//         if (!response.ok) throw new Error((await response.json())?.message);
+
+//         const data = await response.json();
+//         successCallback(data);
+//         return data;
+//     } catch (error) {
+//         errorCallback(error);
+//         return null;
+//     }
+// }
+export async function uploadFile(event, successCallback=(data)=>{console.log(data)}, errorCallback=(error)=>console.error(error)) {
+	event.preventDefault();
+	const formData = new FormData(event.target, event.submitter);
+	try {
+		const token = getItemWithExpiry("token");
+
+		if (!token) {
+			throw new Error("Log in/ Register to Perform This action");
+		}
+		const url = hostSocket + '/file/upload/';
+		const method = 'POST';
+		const response = await fetch(url, {
+			method: method,
+			headers: {
+				// "Content-Type": "multipart/form-data",
+				Authorization: `Bearer ${token}`,
+			}, // set JWT token with Bearer prefix
+			body: formData,
+		});
+		// check for errors :
+		if (!response.ok) {
+			const error_data = await response.json()
+			throw new Error(error_data?.message);
+		}
+		// success :
+		const data = await response.json()
+		successCallback(data)
+		return data;
+	} catch (error) {
+		// error :
+		errorCallback(error)
+		return null
+	}
+}
+uploadFile.handler=(successCallback, errorCallback)=>{
+	return function (event){
+		uploadFile(event, successCallback, errorCallback)
+	}
 }
 
 // Local storage helpers
@@ -163,32 +271,6 @@ export const fetchUserDetail = async () => {
         return false;
     }
 };
-
-// File upload function
-export async function uploadFile(event, successCallback = console.log, errorCallback = console.error) {
-    event.preventDefault();
-    const formData = new FormData(event.target, event.submitter);
-
-    try {
-        const token = getItemWithExpiry("token");
-        if (!token) throw new Error("Log in/Register to perform this action");
-
-        const response = await fetch(`${hostSocket}/file/upload/`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
-            body: formData,
-        });
-
-        if (!response.ok) throw new Error((await response.json())?.message);
-
-        const data = await response.json();
-        successCallback(data);
-        return data;
-    } catch (error) {
-        errorCallback(error);
-        return null;
-    }
-}
 
 // Fetch event by ID
 export const fetchEventById = async id => {
