@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Header.css";
 import UserForm from "../../pages/UserForm";
 import Events from "../Teacher/Events/Events";
@@ -7,6 +7,16 @@ import imge from "../../public/image.png"; // Adjust the path as necessary
 export default function Header() {
   const [activePage, setActivePage] = useState("event");
   const [formType, setFormType] = useState("login"); // Control login/signup
+
+  useEffect(() => {
+    const handleUnload = () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+    };
+
+    window.addEventListener("unload", handleUnload);
+    return () => window.removeEventListener("unload", handleUnload);
+  }, []);
 
   return (
     <div>

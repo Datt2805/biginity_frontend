@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { logInUser, registerUser, verifyEmail } from "../utils/formHandlers.js";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ImageUploader from "../components/Common/ImageUploader.jsx"
 import "./UserForm.css";
 
 const UserForm = () => {
@@ -16,6 +17,9 @@ const UserForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isEmailValid, setIsEmailValid] = useState(false);
   const navigate = useNavigate();
+  
+  const [speakerImageUrl, setSpeakerImageUrl] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -27,43 +31,51 @@ const UserForm = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
+  
     try {
       if (formType === "register") {
         if (!validateNickname(nickname)) {
           toast.error("Nickname must be at least 4 characters long.");
+          setLoading(false);
           return;
         }
+  
         if (!validatePassword(password)) {
           toast.error(
             "Password must be at least 8 characters and include a letter, a number, and a special character."
           );
+          setLoading(false);
           return;
         }
-        const response = await registerUser(event, navigate);
-        if (response.success) {
+  
+        if (role === "Speaker" && !speakerImageUrl) {
+          toast.error("Please upload an image before submitting!");
+          setLoading(false);
+          return;
+        }
+  
+        const response = await registerUser(event, navigate, speakerImageUrl);
+        if (response?.success) {
           toast.success("Registration successful! Please log in.");
         } else {
           toast.error("Registration failed. Please try again.");
         }
       } else {
         const response = await logInUser(event, navigate);
-        if (!response.success) {
-          toast.error("Invalid email or password.", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-          });
+        if (!response?.success) {
+          toast.error("Invalid email or password.");
         } else {
           toast.success("Login successful!");
         }
       }
     } catch (err) {
       toast.error(err.message || "An error occurred during submission.");
+    } finally {
+      setLoading(false);
     }
   };
+  
 
   const validateEmail = (emailValue = email) => emailValue.trim() !== "";
 
@@ -203,23 +215,32 @@ const UserForm = () => {
                   <option value="President">President</option>
                 </select>
               )}{role === "Speaker" && (
-                <div>
-                  <label htmlFor="objectives">
-                    About Speaker<span style={{ color: "red" }}>*</span>
-                  </label>
-                  <textarea id="about" name="about" required></textarea>
-                  <>
-                    <label htmlFor="Orgenization">
-                      Organization<span style={{ color: "red" }}>*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="organization"
-                      name="organization"
-                      required/>
-                  </>
-                </div>
-              )}
+  <div>
+    {/* Upload Speaker Image */}
+    <label>
+      Upload Speaker Image <span style={{ color: "red" }}>*</span>
+    </label>
+    <ImageUploader onUploadSuccess={setSpeakerImageUrl} />
+
+    {/* Show uploaded preview */}
+    {speakerImageUrl && (
+      <div className="image-preview">
+        <img src={speakerImageUrl} alt="Speaker" width={200} />
+      </div>
+    )}
+
+    <label htmlFor="objectives">
+      About Speaker <span style={{ color: "red" }}>*</span>
+    </label>
+    <textarea id="about" name="about" required></textarea>
+
+    <label htmlFor="organization">
+      Organization <span style={{ color: "red" }}>*</span>
+    </label>
+    <input type="text" id="organization" name="organization" required />
+  </div>
+)}
+
             </>
           )}
 
@@ -275,3 +296,6 @@ const UserForm = () => {
 };
 
 export default UserForm;
+
+
+

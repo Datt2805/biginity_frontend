@@ -1,9 +1,9 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { toast } from "react-toastify";
-import { uploadFile, hostSocket } from "../../services/api"; // Import uploadFile from api.js
+import { uploadFile } from "../../services/api"; // Import uploadFile from api.js
 
-// eslint-disable-next-line react/prop-types
 const ImageUploader = ({ onUploadSuccess }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
@@ -17,34 +17,18 @@ const ImageUploader = ({ onUploadSuccess }) => {
     setImagePreview(URL.createObjectURL(file)); // Show preview
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault(); // 🛑 Prevent form refresh (Fix redirect issue)
-
-    if (!selectedFile) {
-      toast.error("Please select a file before submitting.");
-      return;
-    }
-
-    // Manually create FormData to pass to uploadFile
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-
-    await uploadFile(
-      { target: { elements: { file: { files: [selectedFile] } } }, preventDefault: () => {} },
-      (data) => {
-        setUploadedImageUrl(data.url);
-        onUploadSuccess(data.url);
-        toast.success("Image uploaded successfully!");
-        console.log(data.url);
-      },
-      (error) => {
-        toast.error("Image upload failed: " + error.message);
-      }
-    );
-  };
+  const successCallback = (data) => {
+    setUploadedImageUrl(data.url); // Set the uploaded image URL
+    onUploadSuccess(data.url); // Call the success callback with the data
+    toast.success("Image uploaded successfully!");
+  } 
+  const errorCallback = (error) => {
+    toast.error("Image upload failed: " + error.message);
+    console.error("Error uploading image:", error); // wah !
+  } 
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={uploadFile.handler(successCallback, errorCallback)}>
       <label htmlFor="eventImage">
         Upload Event Image <span style={{ color: "red" }}>*</span>
       </label>
@@ -53,8 +37,7 @@ const ImageUploader = ({ onUploadSuccess }) => {
         id="eventImage"
         name="file"
         accept="image/*"
-        onChange={handleFileChange} // Fix: Handle file selection properly
-        required
+        onChange={handleFileChange}
       />
 
       {/* Image Preview */}
@@ -66,11 +49,13 @@ const ImageUploader = ({ onUploadSuccess }) => {
               URL.revokeObjectURL(imagePreview);
               setImagePreview(null);
               setSelectedFile(null);
+              setUploadedImageUrl("");
+              onUploadSuccess(""); 
             }}
           >
             Remove Image
           </button>
-          <img src={`${hostSocket}/uploads/${uploadedImageUrl}`} alt="Event Preview" />
+          <img src={imagePreview} alt="Event Preview" />
         </div>
       )}
 
@@ -81,5 +66,9 @@ const ImageUploader = ({ onUploadSuccess }) => {
     </form>
   );
 };
+ImageUploader.propTypes = {
+  onUploadSuccess: PropTypes.func.isRequired,
+};
 
 export default ImageUploader;
+

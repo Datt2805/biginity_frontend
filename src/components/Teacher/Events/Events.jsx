@@ -52,7 +52,7 @@ const EventsList = () => {
     const loadUserRole = async () => {
         try {
             const res = await fetchUserDetail();
-            console.log("User Role:", res.data.role);
+            // console.log("User Role:", res.data.role);
             setUserRole(res.data.role);
         } catch (err) {
             console.error("Failed to fetch user role", err);

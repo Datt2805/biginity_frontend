@@ -12,14 +12,27 @@ const Classroom = () => {
   const [classrooms, setClassrooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [userRole, setUserRole] = useState(""); // Holds the user's role
+  const [userRole, setUserRole] = useState("");
   const [socketActions, setSocketActions] = useState(null);
+  const [attendanceTimers, setAttendanceTimers] = useState(() => {
+    const savedTimers = JSON.parse(localStorage.getItem("attendanceTimers")) || {};
+    return savedTimers;
+  });
+  
+  useEffect(() => {
+    window.addEventListener("beforeunload", (event) => {
+      if (Object.keys(attendanceTimers).length > 0) {
+        event.preventDefault();
+        event.returnValue = "Attendance is still running. Are you sure you want to leave?";
+      }
+    });
+  }, [attendanceTimers]);
 
   const loadClassrooms = async () => {
     try {
       setLoading(true);
       const data = await fetchClassrooms();
-      setClassrooms(data); // Assume API response is an array of classrooms
+      setClassrooms(data);
     } catch (err) {
       setError(err.message || "Failed to load classrooms");
     } finally {
@@ -30,20 +43,16 @@ const Classroom = () => {
   const loadUserRole = async () => {
     try {
       const res = await fetchUserDetail();
-      // console.log("Fetched user details:", res);
-
-      const role = res?.data?.role?.trim().toLowerCase(); // Normalize role
+      const role = res?.data?.role?.trim().toLowerCase();
       if (role === "teacher" || role === "student") {
         setUserRole(role);
-        localStorage.setItem("role", role); // Save in localStorage
+        localStorage.setItem("role", role);
       } else {
         console.error("Invalid role received:", role);
       }
     } catch (err) {
       console.error("Failed to fetch user role", err);
       setError("Failed to fetch user role");
-      
-      // Fallback: Try getting role from localStorage
       const savedRole = localStorage.getItem("role");
       if (savedRole) {
         setUserRole(savedRole);
@@ -55,7 +64,6 @@ const Classroom = () => {
     loadClassrooms();
     loadUserRole();
 
-    // Initialize socket
     const actions = initSocket({
       newMessageCallback: (data) => console.log("New message received:", data),
       connectionCallback: () => console.log("Connected to socket"),
@@ -68,7 +76,6 @@ const Classroom = () => {
 
     setSocketActions(actions);
 
-    // Cleanup socket connection when component unmounts
     return () => {
       actions.socket.disconnect();
     };
@@ -82,17 +89,29 @@ const Classroom = () => {
     console.log("Starting attendance for:", classroomId);
     socketActions.startAttendance(classroomId, 5);
     alert("Attendance started successfully.");
+
+    const endTime = Date.now() + 5 * 60 * 1000;
+    const updatedTimers = { ...attendanceTimers, [classroomId]: endTime };
+    setAttendanceTimers(updatedTimers);
+    localStorage.setItem("attendanceTimers", JSON.stringify(updatedTimers));
   };
 
-  const handleStopAttendance = (classroomId) => {
-    if (userRole !== "teacher") {
-      alert("Only teachers can stop attendance.");
-      return;
-    }
-    console.log("Stopping attendance for:", classroomId);
-    socketActions.stopAttendance(classroomId);
-    alert("Attendance stopped successfully.");
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAttendanceTimers((prev) => {
+        const updatedTimers = { ...prev };
+        Object.keys(updatedTimers).forEach((classroomId) => {
+          if (updatedTimers[classroomId] <= Date.now()) {
+            delete updatedTimers[classroomId];
+          }
+        });
+        localStorage.setItem("attendanceTimers", JSON.stringify(updatedTimers));
+        return updatedTimers;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handlePunchIn = (classroomId) => {
     if (userRole !== "student") {
@@ -160,9 +179,9 @@ const Classroom = () => {
                   <button onClick={() => handleStartAttendance(classroom._id)}>
                     Start Attendance
                   </button>
-                  <button onClick={() => handleStopAttendance(classroom._id)}>
-                    Stop Attendance
-                  </button>
+                  {attendanceTimers[classroom._id] !== undefined && (
+                    <p>Time left: {Math.max(0, Math.floor((attendanceTimers[classroom._id] - Date.now()) / 1000))}s</p>
+                  )}
                 </>
               )}
               {userRole === "student" && (

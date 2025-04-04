@@ -1,53 +1,59 @@
 
 import { makeRequest, setItemWithExpiry } from "../services/api";
+import { toast } from "react-toastify";
 
-export const registerUser = async (event, navigate) => {
+export const registerUser = async (event, navigate, speakerImageUrl) => {
   event.preventDefault();
+
   const formData = new FormData(event.target);
   const data = Object.fromEntries(formData.entries());
 
-  console.log("Form Data Submitted:", data);
-
   if (!data.role) {
-    console.error("Role is required.");
+    toast.error("Role is required.");
     return;
   }
-
   if (!data.email || !data.password) {
-    console.error("Email and password are required.");
+    toast.error("Email and password are required.");
+    return;
+  }
+  if (!["Student", "Teacher", "Speaker"].includes(data.role)) {
+    toast.error("Invalid role selected.");
+    return;
+  }
+  if (data.role === "Student" && (!data.branch || !data.year || !data.enrollment_id)) {
+    toast.error("Missing student-specific fields.");
+    return;
+  }
+  if (data.role === "Speaker" && !speakerImageUrl) {
+    toast.error("Please upload a speaker image before submitting.");
     return;
   }
 
-  if (data.role !== "Student" && data.role !== "Teacher") {
-    console.error("Invalid role. Must be 'Student' or 'Teacher'.");
-    return;
-  }
-
-  if (data.role === "Student") {
-    if (!data.branch || !data.year || !data.enrollment_id) {
-      console.error("Missing student-specific fields:", {
-        branch: data.branch,
-        year: data.year,
-        enrollment_id: data.enrollment_id,
-      });
-      return;
-    }
+  // Append image URL if available
+  if (speakerImageUrl) {
+    formData.append("image_url", speakerImageUrl);
   }
 
   try {
-    const response = await makeRequest("/api/auth/register", "POST", data);
+    const response = await makeRequest(
+      "/api/auth/register",
+      "POST",
+      Object.fromEntries(formData.entries())
+    );
     if (!response || !response.token) {
       throw new Error("Invalid response from server.");
     }
 
-    console.log("Registration successful:", response.token);
     setItemWithExpiry("token", response.token, 15 * 86400000);
     localStorage.setItem("role", data.role);
+    toast.success("Registration successful! Redirecting...");
     navigate(data.role === "Teacher" ? "/TeacherDashboard" : "/StudentDashboard");
   } catch (error) {
-    console.error("Registration failed:", error?.message || "Unknown error", error?.response || "No server response");
+    toast.error(error?.message || "Registration failed. Try again.");
   }
 };
+
+
 
 export const logInUser = async (event, navigate) => {
   event.preventDefault();
@@ -55,12 +61,11 @@ export const logInUser = async (event, navigate) => {
   const data = Object.fromEntries(formData.entries());
 
   if (!data.email || !data.password) {
-    console.error("Email and password are required.");
+    toast.error("Email and password are required.");
     return;
   }
-
-  if (!data.role || (data.role !== "Student" && data.role !== "Teacher")) {
-    console.error("Invalid or missing role.");
+  if (!data.role || !["Student", "Teacher", "Speaker"].includes(data.role)) {
+    toast.error("Invalid or missing role.");
     return;
   }
 
@@ -72,26 +77,27 @@ export const logInUser = async (event, navigate) => {
 
     setItemWithExpiry("token", response.token, 15 * 86400000);
     localStorage.setItem("role", data.role);
+    toast.success("Login successful! Redirecting...");
     navigate(data.role === "Teacher" ? "/TeacherDashboard" : "/StudentDashboard");
   } catch (error) {
-    console.error("Login failed:", error?.message || "Unknown error", error?.response || "No server response");
+    toast.error("Invalid email, password, or role. Please try again."+ error);
   }
 };
 
 export const verifyEmail = async (email) => {
   if (!email) {
-    console.error("Email is required for verification.");
+    toast.error("Email is required for verification.");
     return null;
   }
-
   try {
     const response = await makeRequest("/api/auth/otp", "POST", { email, purpose: "verification" });
     if (!response) {
       throw new Error("No response from server.");
     }
+    toast.success("Verification email sent!");
     return response;
-  } catch (error) {
-    console.error("Verification failed:", error?.message || "Unknown error", error?.response || "No server response");
+  } catch {
+    toast.error("Verification failed. Please try again.");
     return null;
   }
 };

@@ -107,3 +107,50 @@ legend {
   margin-top: 10px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+:root{
+  --_toggleHeight: 25px;
+  --_toggleWidth: calc(var(--_toggleHeight) * 2);
+  --_toggleSwitchCircle: calc(var(--_toggleHeight) - 10px);
+}
+.togglebutton-input{
+	height: 0;
+	width: 0;
+	visibility: hidden;
+}
+
+.togglebutton-label {
+	cursor: pointer;
+	text-indent: -9999px;
+	width: var(--_toggleWidth);
+	height: var(--_toggleHeight);
+	background: grey;
+	display: block;
+	border-radius: 100px;
+	position: relative;
+}
+
+.togglebutton-label:after {
+	content: '';
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	width: var(--_toggleSwitchCircle);
+	height: var(--_toggleSwitchCircle);
+	border-radius: var(--_toggleSwitchCircle);
+	background: #fff;
+	transition: 0.3s;
+}
+
+.togglebutton-input:checked + .togglebutton-label {
+	background: #bada55;
+}
+
+.togglebutton-input:checked + .togglebutton-label:after {
+	left: calc(100% - 5px);
+	transform: translateX(-100%);
+}
+
+.togglebutton-label:active:after {
+	width: 20px;
+}

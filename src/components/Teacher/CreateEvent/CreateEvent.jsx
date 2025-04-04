@@ -13,38 +13,34 @@ const CreateEvent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     const formData = new FormData(e.target);
-    
-    if (uploadedImageUrl) {
-      formData.append("image_url", uploadedImageUrl);
+
+    if (!uploadedImageUrl) {
+      toast.error("Please upload an image before submitting!");
+      setLoading(false);
+      return;
     }
 
-    try {
-      await createEvent(
-        e, (data) => {
-          toast.success("Event created successfully!");
-          console.log("Event Data:", data);
-        },
-        (error) => {
-          toast.error("Failed to create event: " + error.message);
-        }
-      );
-    // eslint-disable-next-line no-unused-vars
-    } catch (error) {
-      toast.error("An unexpected error occurred.");
-    } finally {
-      setLoading(false);
-    }
+    await createEvent(
+      formData,
+      uploadedImageUrl,
+      () => toast.success("Event created successfully!"),
+      (error) => toast.error("Failed to create event: " + error.message)
+    );
+
+    setLoading(false);
   };
+
 
   return (
     <div className="create-event">
       <h2>Create Event</h2>
+      <ImageUploader onUploadSuccess={setUploadedImageUrl} />
       <form id="createEvent" onSubmit={handleSubmit}>
-        <label>
-          <input type="checkbox" name="mandatory" defaultChecked /> Mandatory
-        </label>
+        {/* Bhai anu css change kar j  */}  
+          <input type="checkbox" className="togglebutton-input" name="mandatory" defaultChecked/> Mandatory
+          <label className="togglebutton-label">
+          </label>
 
         <div>
           <label htmlFor="title">
@@ -79,7 +75,7 @@ const CreateEvent = () => {
           <input type="datetime-local" id="end_time" name="end_time" required />
         </div>
 
-        <fieldset>
+        <fieldset>  
           <legend>Location</legend>
           <div>
             <label htmlFor="address">Address *</label>
@@ -95,12 +91,12 @@ const CreateEvent = () => {
           </div>
         </fieldset>
 
-        <ImageUploader onUploadSuccess={setUploadedImageUrl} />
 
         <button type="submit" disabled={loading}>
-          {loading ? "Submitting..." : "Submit Event"}
-        </button>
+    {loading ? "Uploading & Submitting..." : "Submit Event"}
+</button>
       </form>
+      
       <ToastContainer />
     </div>
   );
