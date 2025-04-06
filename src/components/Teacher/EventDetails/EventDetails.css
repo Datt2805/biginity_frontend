@@ -1,77 +1,157 @@
+/* === Overall Page Background === */
+body {
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* === Main Container === */
 .event-details {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    background-image: linear-gradient(to bottom right, #ffffff, #f9fafe);
 }
 
-.event-details h1 {
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.event-details h2, .event-details h3 {
-    color: #555;
-    margin-top: 15px;
-}
-
-.event-details p {
-    font-size: 16px;
-    color: #666;
-    margin: 8px 0;
-}
-
-.event-details ul {
-    list-style-type: disc;
-    padding-left: 20px;
-    margin: 10px 0;
-}
-
-.event-details ul li {
-    font-size: 16px;
-    color: #444;
-    margin-bottom: 5px;
-}
-
-/* ✅ Image Styling - Makes images smaller */
-.event-details img {
-    max-width: 100%; /* Ensures responsiveness */
-    width: 250px; /* Set a smaller default width */
-    height: auto; /* Maintains aspect ratio */
-    display: block;
-    margin: 10px auto; /* Center aligns */
-    border-radius: 6px; /* Optional: smooth edges */
-    object-fit: contain; /* Ensures full image is visible */
-}
-
-.error {
-    color: red;
-    font-weight: bold;
+/* === Titles === */
+.event-title {
+    font-size: 28px;
+    color: #1f2937;
+    margin-bottom: 20px;
     text-align: center;
-    margin: 20px 0;
 }
 
-.loading {
-    text-align: center;
+/* === Section Headers === */
+.event-section h2,
+.event-section h3 {
+    margin-top: 30px;
+    color: #374151;
+}
+
+.event-section h3 {
     font-size: 18px;
-    color: #555;
+    color: #4b5563;
 }
 
-/* ✅ Responsive adjustments for small screens */
-@media (max-width: 600px) {
+/* === Meta Info === */
+.event-meta p {
+    font-size: 16px;
+    color: #4b5563;
+    margin: 6px 0;
+}
+
+/* === Event Image === */
+.event-image-wrapper {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.event-main-image {
+    width: 320px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    object-fit: contain;
+    border: 1px solid #e5e7eb;
+}
+
+/* === Lists === */
+.event-section ul {
+    list-style-type: disc;
+    padding-left: 25px;
+    margin: 10px 0 20px;
+}
+
+.event-section ul li {
+    font-size: 16px;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+/* === Speakers Grid === */
+.speakers-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 15px;
+    justify-content: flex-start;
+}
+
+/* === Speaker Cards === */
+.speaker-card {
+    width: 160px;
+    background: #f0f4f8;
+    padding: 14px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.speaker-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.speaker-image {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+    border: 2px solid #d1d5db;
+}
+
+/* === Speaker Info === */
+.speaker-info strong {
+    font-size: 15px;
+    color: #1f2937;
+}
+
+.speaker-info small {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* === Responsive Breakpoints === */
+@media (max-width: 768px) {
     .event-details {
-        padding: 15px;
+        padding: 20px;
     }
-    .event-details h1 {
+
+    .event-title {
+        font-size: 24px;
+    }
+
+    .event-main-image {
+        width: 240px;
+    }
+
+    .speakers-grid {
+        justify-content: center;
+    }
+
+    .speaker-card {
+        width: 100%;
+        max-width: 220px;
+    }
+}
+
+@media (max-width: 480px) {
+    .event-title {
         font-size: 20px;
     }
-    .event-details p, .event-details ul li {
-        font-size: 14px;
+
+    .event-main-image {
+        width: 180px;
     }
-    .event-details img {
-        width: 180px; /* Further reduce image size on small screens */
+
+    .event-meta p,
+    .event-section ul li {
+        font-size: 14px;
     }
 }

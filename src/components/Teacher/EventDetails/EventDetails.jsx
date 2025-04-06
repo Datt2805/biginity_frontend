@@ -1,8 +1,7 @@
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line no-unused-vars 
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { fetchEventById } from "../../../services/api";
-import { hostSocket } from "../../../services/api";
+import { fetchEventById, hostSocket, fetchSpeakersByIds } from "../../../services/api";
 import "./EventDetails.css";
 import defaultPlaceholder from "../../../public/image.png";
 
@@ -15,10 +14,17 @@ const EventDetails = () => {
     useEffect(() => {
         const fetchEvent = async () => {
             try {
-                console.log("Fetching event details for ID:", id);
+                setLoading(true);
                 const eventDetails = await fetchEventById(id);
-                setEvent(eventDetails.events[0]);
-                console.log("Event details fetched:", eventDetails);
+                const eventObj = eventDetails.events[0];
+    
+                // If speaker_ids are present but full speaker objects are not
+                if (eventObj?.speaker_ids?.length && !eventObj?.speakers?.length) {
+                    const speakerData = await fetchSpeakersByIds(eventObj.speaker_ids);
+                    eventObj.speakers = speakerData;
+                }
+    
+                setEvent(eventObj);
             } catch (err) {
                 setError(err.message || "Failed to load event details.");
             } finally {
@@ -27,6 +33,7 @@ const EventDetails = () => {
         };
         fetchEvent();
     }, [id]);
+    
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div className="error">{error}</div>;
@@ -35,38 +42,65 @@ const EventDetails = () => {
 
     return (
         <div className="event-details">
-            <h1>{event?.title}</h1>
-            <div className="event-img-wrapper">
-                <img
-                    src={imageUrl || defaultPlaceholder}
-                    alt={event?.title}
-                    onError={(e) => (e.target.src = defaultPlaceholder)}
-                />
+    <h1 className="event-title">{event?.title}</h1>
+
+    <div className="event-image-wrapper">
+        <img
+            src={imageUrl || defaultPlaceholder}
+            alt={event?.title}
+            onError={(e) => (e.target.src = defaultPlaceholder)}
+            className="event-main-image"
+        />
+    </div>
+
+    <div className="event-meta">
+        <p><strong>Mandatory:</strong> {event?.mandatory ? "Yes" : "No"}</p>
+        <p><strong>Start Time:</strong> {new Date(event?.start_time).toLocaleString()}</p>
+        <p><strong>End Time:</strong> {new Date(event?.end_time).toLocaleString()}</p>
+        <p><strong>Location:</strong> {event?.location?.address || "Unknown"}</p>
+    </div>
+
+    <div className="event-section">
+        <h2>Description</h2>
+        <h3>Objectives</h3>
+        <ul>
+            {event?.description?.objectives?.map((obj, index) => (
+                <li key={index}>{obj}</li>
+            ))}
+        </ul>
+        <h3>Learning Outcomes</h3>
+        <ul>
+            {event?.description?.learning_outcomes?.map((outcome, index) => (
+                <li key={index}>{outcome}</li>
+            ))}
+        </ul>
+    </div>
+
+    <div className="event-section">
+        <h2>Speakers</h2>
+        {event?.speakers?.length > 0 ? (
+            <div className="speakers-grid">
+                {event.speakers.map((speaker, index) => (
+                    <div key={index} className="speaker-card">
+                        <img
+                            src={speaker.image?.startsWith("http") ? speaker.image : `${hostSocket}${speaker.image}`}
+                            alt={speaker.name}
+                            onError={(e) => (e.target.src = defaultPlaceholder)}
+                            className="speaker-image"
+                        />
+                        <div className="speaker-info">
+                            <strong>{speaker.name}</strong><br />
+                            <small>{speaker.email}</small>
+                        </div>
+                    </div>
+                ))}
             </div>
-            <p><strong>Mandatory:</strong> {event?.mandatory ? "Yes" : "No"}</p>
-            <h2>Description</h2>
-            <h3>Objectives:</h3>
-            <ul>
-                {event?.description?.objectives?.map((obj, index) => (
-                    <li key={index}>{obj}</li>
-                ))}
-            </ul>
-            <h3>Learning Outcomes:</h3>
-            <ul>
-                {event?.description?.learning_outcomes?.map((outcome, index) => (
-                    <li key={index}>{outcome}</li>
-                ))}
-            </ul>
-            <p><strong>Start Time:</strong> {new Date(event?.start_time).toLocaleString()}</p>
-            <p><strong>End Time:</strong> {new Date(event?.end_time).toLocaleString()}</p>
-            <p><strong>Location:</strong> {event?.location?.address || "Unknown"}</p>
-            <h2>Speakers</h2>
-            <ul>
-                {event?.speaker_ids?.map((speaker, index) => (
-                    <li key={index}>Speaker ID: {speaker}</li>
-                ))}
-            </ul>
-        </div>
+        ) : (
+            <p>No speakers available.</p>
+        )}
+    </div>
+</div>
+
     );
 };
 

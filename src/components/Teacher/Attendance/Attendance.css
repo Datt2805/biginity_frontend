@@ -82,3 +82,17 @@ button:hover {
     background-color: #ccc;
     cursor: not-allowed;
 }
+
+.csv-button {
+    margin-bottom: 15px;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}  
+.csv-button:hover {
+    background-color: #0056b3;
+}

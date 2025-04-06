@@ -5,54 +5,73 @@ import { toast } from "react-toastify";
 export const registerUser = async (event, navigate, speakerImageUrl) => {
   event.preventDefault();
 
-  const formData = new FormData(event.target);
-  const data = Object.fromEntries(formData.entries());
+  const form = event.target;
 
-  if (!data.role) {
-    toast.error("Role is required.");
-    return;
-  }
-  if (!data.email || !data.password) {
-    toast.error("Email and password are required.");
-    return;
-  }
-  if (!["Student", "Teacher", "Speaker"].includes(data.role)) {
-    toast.error("Invalid role selected.");
-    return;
-  }
-  if (data.role === "Student" && (!data.branch || !data.year || !data.enrollment_id)) {
-    toast.error("Missing student-specific fields.");
-    return;
-  }
-  if (data.role === "Speaker" && !speakerImageUrl) {
-    toast.error("Please upload a speaker image before submitting.");
-    return;
+  const data = {
+    name: form.name?.value,
+    nickname: form.nickname?.value,
+    email: form.email?.value,
+    otp: form.otp?.value,
+    password: form.password?.value,
+    role: form.role?.value,
+    gender: form.gender?.value,
+  };
+
+  if (!data.role) return toast.error("Role is required.");
+  if (!data.email || !data.password) return toast.error("Email and password are required.");
+  if (!data.nickname) return toast.error("Nickname is required.");
+  if (!["Student", "Teacher", "Speaker"].includes(data.role)) return toast.error("Invalid role selected.");
+
+  // Student-specific fields
+  if (data.role === "Student") {
+    data.branch = form.branch?.value;
+    data.year = form.year?.value;
+    data.stream = form.stream?.value;
+    data.enrollment_id = form.enrollment_id?.value;
+
+    if (!data.branch || !data.year || !data.enrollment_id || !data.stream) {
+      return toast.error("Please fill all student fields.");
+    }
   }
 
-  // Append image URL if available
-  if (speakerImageUrl) {
-    formData.append("image_url", speakerImageUrl);
+  // Teacher-specific field
+  if (data.role === "Teacher") {
+    data.title = form.title?.value;
+    if (!data.title) return toast.error("Please select a title.");
+  }
+
+  // Speaker-specific fields
+  if (data.role === "Speaker") {
+    if (!speakerImageUrl) return toast.error("Speaker image is required.");
+    data.image = speakerImageUrl;
+    data.about = form.about?.value;
+    data.organization = form.organization?.value;
+
+    if (!data.about || !data.organization) {
+      return toast.error("Please fill out 'About' and 'Organization' fields.");
+    }
   }
 
   try {
-    const response = await makeRequest(
-      "/api/auth/register",
-      "POST",
-      Object.fromEntries(formData.entries())
-    );
+    console.log("Submitting speaker data:", data);
+    const response = await makeRequest("/api/auth/register", "POST", data);
+
     if (!response || !response.token) {
-      throw new Error("Invalid response from server.");
+      throw new Error("Registration failed.");
     }
 
     setItemWithExpiry("token", response.token, 15 * 86400000);
     localStorage.setItem("role", data.role);
-    toast.success("Registration successful! Redirecting...");
+
+    toast.success("Registration successful!");
     navigate(data.role === "Teacher" ? "/TeacherDashboard" : "/StudentDashboard");
-  } catch (error) {
-    toast.error(error?.message || "Registration failed. Try again.");
+
+    return { success: true };
+  } catch (err) {
+    toast.error(err.message || "Something went wrong.");
+    return { success: false };
   }
 };
-
 
 
 export const logInUser = async (event, navigate) => {

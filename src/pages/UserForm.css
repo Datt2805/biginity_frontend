@@ -1,229 +1,239 @@
 :root {
-    --primary-color: #007bff;
-    --secondary-color: #f8f9fa;
-    --text-color: #333;
-    --error-color: #dc3545;
-    --border-radius: 8px;
-    --font-family: 'Arial', sans-serif;
-  }
-  
-  /* Base styling */
-  body {
-      margin: 0;
-      font-family: var(--font-family);
-  }
-  
-  .user-form {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 50px;
-  }
-  /* Form container */
-  .form-container {
-    width: 100%; /* Changed from 200% */
-    max-width: 500px;
-    background: rgb(230, 227, 227);
-    border-radius: var(--border-radius);
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    display: flex;
-    align-items: center;  
-    justify-content: center;
-    flex-direction: column;
-    gap: 20px;
-    box-sizing: border-box;
-  }
-  
-  /* Toggle buttons */
-  .toggle-buttons {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-bottom: 20px;
-  }
-  
-  .toggle-buttons button {
-    flex: 1;
-    margin: 0 5px;
-    padding: 12px;
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--primary-color);
-    background: white;
-    border: 2px solid var(--primary-color);
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .toggle-buttons button.active,
-  .toggle-buttons button:hover {
-    background: var(--primary-color);
-    color: white;
-  }
-  
-  legend {
-    padding: 0 10px;
-    font-size: 18px;
-    font-weight: bold;
-    color: var(--text-color);
-  }
-  
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 100%;
-  }
-  
-  /* Uniform input and select styling */
-  input,
-  select {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: var(--border-radius);
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-  }
-  
-  input:focus,
-  select:focus {
-    border-color: var(--primary-color);
-    outline: none;
-    box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
-  }
-  
-  textarea{
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: var(--border-radius);
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-  }
-  /* Submit button */
-  button[type="submit"] {
-    padding: 12px;
-    font-size: 16px;
-    color: white;
-    background-color: var(--primary-color);
-    border: none;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  
-  button[type="submit"]:hover {
-    background-color: #0056b3;
-    transform: scale(1.02);
-  }
-  
-  /* Animation */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* Responsive design */
-  @media (max-width: 480px) {
-    .form-container {
-      padding: 15px;
-    }
-  }
-  
-  .password-field {
-    display: flex;
-    align-items: center;
-  }
-  
-  .toggle-password {
-    margin-left: 8px;
-    padding: 6px 10px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-  
-  .error-message {
-    color: red;
-    font-size: 14px;
-    margin-top: 10px;
-  }
+  --primary-color: #007bff;
+  --secondary-color: #85aace;
+  --text-color: #333;
+  --error-color: #dc3545;
+  --border-radius: 10px;
+  --font-family: 'Arial', sans-serif;
+}
 
-  /* Customize the toast container */
+/* Reset & base */
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  background-color: #f0f2f5;
+}
+
+.user-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+  padding: 0 15px;
+}
+
+/* Form container */
+.form-container {
+  width: 100%;
+  max-width: 480px;
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.1);
+  padding: 25px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+/* Toggle buttons */
+.toggle-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.toggle-buttons button {
+  flex: 1;
+  padding: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--primary-color);
+  background: white;
+  border: 2px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.toggle-buttons button.active,
+.toggle-buttons button:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* Form fields */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  transition: 0.3s ease;
+  box-sizing: border-box;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.3);
+  outline: none;
+}
+
+/* Password toggle layout */
+.password-field {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.password-field input {
+  flex: 1;
+}
+
+.toggle-password {
+  padding-bottom: 19px;
+  position: absolute;
+  right: -3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--primary-color);
+}
+.verify-email-btn{
+  background: var(--primary-color);
+  color: white;
+  padding: 10px 15px;
+  border-radius: var(--border-radius);
+  font-size: 15px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color  0.9s ease; 
+}
+/* Submit button */
+button[type="submit"] {
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #0056b3;
+  transform: scale(1.02);
+}
+
+/* Speaker section */
+.speaker-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: var(--border-radius);
+  border: 1px solid #ddd;
+}
+
+.speaker-section label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text-color);
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Image preview */
+.image-preview {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.image-preview img {
+  max-width: 150px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Toast styles */
 .Toastify__toast-container {
   z-index: 10000;
 }
 
-/* Customize the toast messages */
 .Toastify__toast {
-  border-radius: 8px;
-  font-size: 16px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius);
+  font-size: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
 }
 
-/* Success toast */
 .Toastify__toast--success {
-  background-color: #4caf50; /* Green */
+  background-color: #28a745;
   color: white;
 }
 
-/* Error toast */
 .Toastify__toast--error {
-  background-color: #f44336; /* Red */
+  background-color: #dc3545;
   color: white;
 }
 
-/* Close button */
 .Toastify__close-button {
   color: white;
 }
 
-/* Customize progress bar */
 .Toastify__progress-bar {
-  background: #ffffff;
+  background: #fff;
 }
 
-.image-preview {
-  margin-top: 10px;
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.image-preview img {
-  width: 150px;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
-}
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .form-container {
+    padding: 20px;
+    gap: 15px;
+  }
 
-.image-preview button {
-  display: inline-block;
-  margin-bottom: 10px;
-  background-color: #ff4d4f;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
+  .toggle-buttons button {
+    font-size: 14px;
+    padding: 10px 8px;
+  }
 
-.image-upload-wrapper {
-  margin-top: 10px;
-}
+  input,
+  select,
+  textarea {
+    font-size: 14px;
+    padding: 10px;
+  }
 
-.image-preview {
-  margin-top: 10px;
-}
-
-.image-preview img {
-  border-radius: 10px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  button[type="submit"] {
+    font-size: 15px;
+  }
 }
