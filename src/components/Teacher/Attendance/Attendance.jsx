@@ -5,27 +5,6 @@ import { makeSecureRequest } from '../../../services/api';
 
 const ITEMS_PER_PAGE = 5;
 
-function haversineDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371e3; // Earth's radius in meters
-
-  const toRadians = (deg) => deg * (Math.PI / 180);
-
-  const φ1 = toRadians(lat1);
-  const φ2 = toRadians(lat2);
-  const Δφ = toRadians(lat2 - lat1);
-  const Δλ = toRadians(lon2 - lon1);
-
-  const a = Math.sin(Δφ / 2) ** 2 +
-            Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ / 2) ** 2;
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return R * c; // Distance in meters
-}
-
-
-
 const ViewAttendancePage = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [eventData, setEventData] = useState([]); // Store event details
@@ -38,9 +17,8 @@ const ViewAttendancePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetchEventData().then(()=>{
-      fetchAttendanceData();
-    });
+    fetchEventData();
+    fetchAttendanceData();
   }, []);
 
   // Fetch Event Data
@@ -48,12 +26,12 @@ const ViewAttendancePage = () => {
     try {
       const response = await makeSecureRequest(`/api/events`, "GET", {});
       
-      if (!response ) {
+      if (!response || !response.data || !Array.isArray(response.data.events)) {
         throw new Error("Invalid event data format");
       }
   
-      console.log("Fetched Events:", response.events); // Debugging
-      setEventData(response.events);
+      console.log("Fetched Events:", response.data.events); // Debugging
+      setEventData(response.data.events);
     } catch (err) {
       console.error("Error fetching events:", err.message || err);
       setEventData([]); // Set empty array to prevent undefined issues
@@ -81,21 +59,9 @@ const ViewAttendancePage = () => {
 
   // Function to get event name from event ID
   const getEventName = (eventId) => {
-    // console.log(eventId, eventData)
     const event = eventData.find(e => e._id === eventId);
-    // console.log(event)
     return event ? event.title : "N/A"; // Return event name or "N/A" if not found
   };
-
-  // Function to calculate distance between location of event and the position of attendee;
-  const calcDistance=(record)=>{
-    const event = eventData.find(e => e._id === record.event_id);
-    if(record.status === "to be taken") return "N\/A"
-    if(event?.location?.lat && event?.location?.lat && record.locations[0]?.lat && record.locations[0]?.long) 
-      return haversineDistance(event.location.lat, event.location.long,record.locations[0].lat,record.locations[0].long ).toFixed(2)+"m"
-
-    return "-"
-  }
 
   // Apply Filters
   const filteredData = attendanceData.filter((record) => (
@@ -154,7 +120,7 @@ const ViewAttendancePage = () => {
               <th>Status</th>
               <th>Punch In</th>
               <th>Punch Out</th>
-              <th>Distance from event location</th>
+              <th>Location</th>
             </tr>
           </thead>
           <tbody>
@@ -170,7 +136,7 @@ const ViewAttendancePage = () => {
                 <td>{record.status}</td>
                 <td>{record.punch_in_time ? new Date(record.punch_in_time).toLocaleString() : 'N/A'}</td>
                 <td>{record.punch_out_time ? new Date(record.punch_out_time).toLocaleString() : 'N/A'}</td>
-                <td>{calcDistance(record)}</td>
+                <td>{record.locations?.length > 0 ? `${record.locations[0].lat}, ${record.locations[0].long}` : 'N/A'}</td>
               </tr>
             ))}
           </tbody>
