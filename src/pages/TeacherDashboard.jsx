@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, Link, Outlet, useNavigate } from "react-router-dom";
 import Classroom from "../components/Teacher/Classroom/Classroom";
 import Events from "../components/Teacher/Events/Events";
 import Attendance from "../components/Teacher/Attendance/Attendance";
 import CreateEvent from "../components/Teacher/CreateEvent/CreateEvent";
+import { fetchUserDetail } from "../services/api"; 
 import "./TeacherDashboard.css";
 
 // Define tabs to be used for navigation
@@ -17,7 +18,19 @@ const tabs = [
 
 const TeacherDashboard = () => {
   const [activeTab, setActiveTab] = useState("Classroom");
+  const [userName, setUserName] = useState("");
   const navigate = useNavigate(); // Hook to handle navigation
+
+  useEffect(() => {
+    const getUserName = async () => {
+      const user = await fetchUserDetail();
+      // console.log(user.data.nickname);
+      setUserName(user.data.nickname || "Teacher");
+    };
+  
+    getUserName();
+  }, []);
+  
 
   // Function to handle logout
   const handleLogout = () => {
@@ -37,7 +50,7 @@ const TeacherDashboard = () => {
   return (
     <div className="teacher-dashboard">
       <div className="dashboard-header">
-        <h1>Teacher Dashboard</h1>
+      <h1>Welcome, {userName}</h1>
         {/* Logout Button */}
         <button className="logout-btn" onClick={handleLogout}>Logout</button>
       </div>

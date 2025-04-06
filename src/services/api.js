@@ -206,6 +206,8 @@ export const fetchUserDetail = async () => {
         if (cached?.role) return cached;
 
         const res = await makeSecureRequest("/api/auth/wmi", "GET");
+        console.log("User details fetched:", res);
+        
         setItemWithExpiry("user-details", res, 60 * 60 * 60 * 12); // 12 hours
         return res;
     } catch (error) {
@@ -226,8 +228,10 @@ export const fetchEventById = async (id) => {
 // Fetch multiple speaker details by their IDs
 export const fetchSpeakersByIds = async (ids = []) => {
     const promises = ids.map(id =>
-        makeSecureRequest(`/api/users/${id}`, 'GET').catch(err => null)
+        makeSecureRequest(`/api/users/${id}`, 'GET').catch(() => null)
     );
     const results = await Promise.all(promises);
+    console.log("Speaker details fetched:", results);
+    
     return results.filter(speaker => speaker); // Filter out any failed ones
 };

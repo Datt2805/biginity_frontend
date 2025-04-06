@@ -117,170 +117,168 @@ const UserForm = () => {
 
   return (
     <div className="user-form">
-  <div className="form-container">
-    {/* Toggle Register/Login */}
-    <div className="toggle-buttons">
-      <button
-        onClick={() => setFormType("register")}
-        className={`toggle-btn ${formType === "register" ? "active" : ""}`}
-      >
-        Register
-      </button>
-      <button
-        onClick={() => setFormType("login")}
-        className={`toggle-btn ${formType === "login" ? "active" : ""}`}
-      >
-        Login
-      </button>
-    </div>
-
-    <form onSubmit={handleFormSubmit}>
-      {formType === "register" && (
-        <>
-          <input type="text" name="name" placeholder="Name" />
-          <input
-            type="text"
-            name="nickname"
-            placeholder="Nickname"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={email}
-            onChange={handleEmailChange}
-          />
-          <button className="verify-email-btn"
-            type="button"
-            onClick={handleVerifyEmail}
-            disabled={!isEmailValid}
+      <div className="form-container">
+        {/* Toggle Register/Login */}
+        <div className="toggle-buttons">
+          <button
+            onClick={() => setFormType("register")}
+            className={`toggle-btn ${formType === "register" ? "active" : ""}`}
           >
-            Get OTP
+            Register
           </button>
-          <input type="number" name="otp" placeholder="OTP" />
+          <button
+            onClick={() => setFormType("login")}
+            className={`toggle-btn ${formType === "login" ? "active" : ""}`}
+          >
+            Login
+          </button>
+        </div>
 
-          <div className="password-field">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <button
-              type="button"
-              className="toggle-password"
-              onClick={() => setShowPassword((prev) => !prev)}
-            >
-              {showPassword ? <FaEye /> : <FaEyeSlash />}
-            </button>
-          </div>
-
-          <select name="role" value={role} onChange={handleRoleChange}>
-            <option value="Teacher">Teacher</option>
-            <option value="Speaker">Speaker</option>
-            <option value="Student">Student</option>
-          </select>
-
-          <select name="gender" value={gender} onChange={handleGenderChange}>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
-
-          {role === "Student" && (
+        <form onSubmit={handleFormSubmit}>
+          {formType === "register" && (
             <>
-              <input name="branch" placeholder="Branch" />
-              <input name="year" type="number" min="2022" max="2050" placeholder="Year" />
-              <input name="stream" placeholder="Stream" />
-              <input name="enrollment_id" placeholder="Enrollment ID" />
+              <input type="text" name="name" placeholder="Name" />
+              <input
+                type="text"
+                name="nickname"
+                placeholder="Nickname"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={email}
+                onChange={handleEmailChange}
+              />
+              <button className="verify-email-btn"
+                type="button"
+                onClick={handleVerifyEmail}
+                disabled={!isEmailValid}
+              >
+                Get OTP
+              </button>
+              <input type="number" name="otp" placeholder="OTP" />
+
+              <div className="password-field">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <FaEye /> : <FaEyeSlash />}
+                </button>
+              </div>
+
+              <select name="role" value={role} onChange={handleRoleChange}>
+                <option value="Teacher">Teacher</option>
+                <option value="Speaker">Speaker</option>
+                <option value="Student">Student</option>
+              </select>
+
+              <select name="gender" value={gender} onChange={handleGenderChange}>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+
+              {role === "Student" && (
+                <>
+                  <input name="branch" placeholder="Branch" />
+                  <input name="year" type="number" min="2022" max="2050" placeholder="Year" />
+                  <input name="stream" placeholder="Stream" />
+                  <input name="enrollment_id" placeholder="Enrollment ID" />
+                </>
+              )}
+
+              {role === "Teacher" && (
+                <select name="title" placeholder="Title">
+                  <option value="Program Coordinator">Program Coordinator</option>
+                  <option value="Head Of Department">Head Of Department</option>
+                  <option value="Dean">Dean</option>
+                  <option value="Provost">Provost</option>
+                  <option value="President">President</option>
+                </select>
+              )}
+
+              {role === "Speaker" && (
+                <div className="speaker-section">
+                  <ImageUploader onUploadSuccess={setSpeakerImageUrl} />
+                  {speakerImageUrl && (
+                    <div className="image-preview">
+                      <img src={speakerImageUrl} alt="Speaker Preview" width={200} />
+                    </div>
+                  )}
+                  <label htmlFor="about">
+                    About Speaker <span style={{ color: "red" }}>*</span>
+                  </label>
+                  <textarea id="about" name="about" required></textarea>
+                  <label htmlFor="organization">
+                    Organization <span style={{ color: "red" }}>*</span>
+                  </label>
+                  <input type="text" id="organization" name="organization" required />
+                </div>
+              )}
+
             </>
           )}
 
-          {role === "Teacher" && (
-            <select name="title" placeholder="Title">
-              <option value="Program Coordinator">Program Coordinator</option>
-              <option value="Head Of Department">Head Of Department</option>
-              <option value="Dean">Dean</option>
-              <option value="Provost">Provost</option>
-              <option value="President">President</option>
-            </select>
+          {formType === "login" && (
+            <>
+              <input
+                type="text"
+                name="nickname"
+                placeholder="Nickname"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={email}
+                onChange={handleEmailChange}
+              />
+              <select name="role" value={role} onChange={handleRoleChange}>
+                <option value="Teacher">Teacher</option>
+                <option value="Speaker">Speaker</option>
+                <option value="Student">Student</option>
+              </select>
+
+              <div className="password-field">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <FaEye /> : <FaEyeSlash />}
+                </button>
+              </div>
+            </>
           )}
 
-          {role === "Speaker" && (
-            <div className="speaker-section">
-              <label>
-                Upload Speaker Image <span style={{ color: "red" }}>*</span>
-              </label>
-              <ImageUploader onUploadSuccess={setSpeakerImageUrl} />
-              {speakerImageUrl && (
-                <div className="image-preview">
-                  <img src={speakerImageUrl} alt="Speaker Preview" width={200} />
-                </div>
-              )}
-              <label htmlFor="about">
-                About Speaker <span style={{ color: "red" }}>*</span>
-              </label>
-              <textarea id="about" name="about" required></textarea>
-              <label htmlFor="organization">
-                Organization <span style={{ color: "red" }}>*</span>
-              </label>
-              <input type="text" id="organization" name="organization" required />
-            </div>
-          )}
-        </>
-      )}
+          <button type="submit" disabled={loading} className="submit-btn">
+            {loading ? "Submitting..." : formType === "register" ? "Register" : "Login"}
+          </button>
+        </form>
 
-      {formType === "login" && (
-        <>
-          <input
-            type="text"
-            name="nickname"
-            placeholder="Nickname"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={email}
-            onChange={handleEmailChange}
-          />
-          <select name="role" value={role} onChange={handleRoleChange}>
-            <option value="Teacher">Teacher</option>
-            <option value="Speaker">Speaker</option>
-            <option value="Student">Student</option>
-          </select>
-
-          <div className="password-field">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <button
-              type="button"
-              className="toggle-password"
-              onClick={() => setShowPassword((prev) => !prev)}
-            >
-              {showPassword ? <FaEye /> : <FaEyeSlash />}
-            </button>
-          </div>
-        </>
-      )}
-
-      <button type="submit" disabled={loading} className="submit-btn">
-        {loading ? "Submitting..." : formType === "register" ? "Register" : "Login"}
-      </button>
-    </form>
-
-    <ToastContainer />
-  </div>
-</div>
+        <ToastContainer />
+      </div>
+    </div>
   );
 };
 
