@@ -3,7 +3,7 @@ import { makeRequest, setItemWithExpiry } from "../services/api";
 import { toast } from "react-toastify";
 
 export const registerUser = async (event, navigate, speakerImageUrl) => {
-  // event.preventDefault();
+  event.preventDefault();
 
   const form = event.target;
 

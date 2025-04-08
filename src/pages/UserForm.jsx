@@ -183,6 +183,7 @@ const UserForm = () => {
               </div>
 
               <select name="role" value={role} onChange={handleRoleChange}>
+                <option value="">Select Role</option>
                 <option value="Teacher">Teacher</option>
                 <option value="Speaker">Speaker</option>
                 <option value="Student">Student</option>

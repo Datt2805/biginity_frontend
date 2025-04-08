@@ -19,6 +19,7 @@ const CreateSpeaker = () => {
         about: "",
         organization: "",
     });
+
     
     const [showPassword, setShowPassword] = useState(false);
     const [speakerImageUrl, setSpeakerImageUrl] = useState("");
@@ -49,12 +50,12 @@ const CreateSpeaker = () => {
         }));
     };
 
-    const handleVerifyEmail = async (e) => {
-        e.preventDefault();
+    const handleVerifyEmail = async (event) => {
+        event.preventDefault();
         if (!isEmailValid) return;
 
         setIsVerifying(true);
-        const button = e.target;
+        const button = event.target;
         button.disabled = true;
 
         const response = await verifyEmail(form.email);
@@ -77,8 +78,8 @@ const CreateSpeaker = () => {
         }, 1000);
     };
 
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
         setLoading(true);
     
         if (!form.name || form.name.length < 3) {
@@ -113,7 +114,7 @@ const CreateSpeaker = () => {
     
         try {
             console.log("Submitting speaker data:", form);
-            const response = await registerUser(e, navigate, speakerImageUrl); // Pass event correctly
+            const response = await registerUser(form , navigate, speakerImageUrl); // Pass event correctly
     
             if (response?.success) {
                 toast.success("Speaker registered successfully!");
@@ -147,6 +148,7 @@ const CreateSpeaker = () => {
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                     </select>
+                    <input type="hidden" name="role" value="Speaker" />
                     <div className="password-field">
                         <input
                             type={showPassword ? "text" : "password"}
