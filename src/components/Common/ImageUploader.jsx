@@ -7,7 +7,7 @@ import { uploadFile } from "../../services/api"; // Import uploadFile from api.j
 const ImageUploader = ({ onUploadSuccess }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
-  const [setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];

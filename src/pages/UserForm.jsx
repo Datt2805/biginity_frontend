@@ -133,7 +133,11 @@ const UserForm = () => {
             Login
           </button>
         </div>
-
+        {role === "Speaker" && (
+          <>
+            <ImageUploader onUploadSuccess={setSpeakerImageUrl} />
+          </>
+        )}
         <form onSubmit={handleFormSubmit}>
           {formType === "register" && (
             <>
@@ -210,7 +214,6 @@ const UserForm = () => {
 
               {role === "Speaker" && (
                 <div className="speaker-section">
-                  <ImageUploader onUploadSuccess={setSpeakerImageUrl} />
                   {speakerImageUrl && (
                     <div className="image-preview">
                       <img src={speakerImageUrl} alt="Speaker Preview" width={200} />

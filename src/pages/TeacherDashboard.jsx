@@ -5,6 +5,9 @@ import Classroom from "../components/Teacher/Classroom/Classroom";
 import Events from "../components/Teacher/Events/Events";
 import Attendance from "../components/Teacher/Attendance/Attendance";
 import CreateEvent from "../components/Teacher/CreateEvent/CreateEvent";
+import { toast } from "react-toastify"; // Importing toast for notifications
+import "react-toastify/dist/ReactToastify.css"; // Importing CSS for toast notifications
+import CreateSpeaker from "../components/Teacher/CreateSpeaker/CreateSpeaker";
 import { fetchUserDetail } from "../services/api"; 
 import "./TeacherDashboard.css";
 
@@ -13,7 +16,8 @@ const tabs = [
   { name: "Classroom", component: <Classroom /> },
   { name: "Events", component: <Events /> },
   { name: "Attendance", component: <Attendance /> },
-  { name: "CreateEvent", component: <CreateEvent /> }
+  { name: "CreateEvent", component: <CreateEvent /> },
+  { name: "CreateSpeaker", component: <CreateSpeaker /> }
 ];
 
 const TeacherDashboard = () => {
