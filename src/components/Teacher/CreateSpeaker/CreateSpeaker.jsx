@@ -14,10 +14,11 @@ const CreateSpeaker = () => {
         email: "",
         otp: "",
         password: "",
+        gender: "Male",
         about: "",
         organization: "",
-        role: "Speaker",
     });
+    
     const [showPassword, setShowPassword] = useState(false);
     const [speakerImageUrl, setSpeakerImageUrl] = useState("");
     const [loading, setLoading] = useState(false);
@@ -30,15 +31,21 @@ const CreateSpeaker = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => {
-            const updatedFormData = { ...prev, [name]: value };
-            console.log("Updated formData:", updatedFormData);
-            return updatedFormData;
-        });
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
 
         if (name === "email") {
             setIsEmailValid(validateEmail(value));
         }
+    };
+
+    const handleGenderChange = (e) => {
+        setFormData((prev) => ({
+            ...prev,
+            gender: e.target.value,
+        }));
     };
 
     const handleVerifyEmail = async (e) => {
@@ -73,9 +80,7 @@ const CreateSpeaker = () => {
         e.preventDefault();
         setLoading(true);
 
-        console.log("Form Data before submission:", formData);
-
-        const { name, nickname, password } = formData;
+        const { name, nickname, password, about, organization } = formData;
 
         if (!name || name.length < 3) {
             toast.error("Name must be at least 3 characters long.");
@@ -95,22 +100,22 @@ const CreateSpeaker = () => {
             return;
         }
 
+        if (!about || !organization) {
+            toast.error("Please fill out 'About' and 'Organization' fields.");
+            setLoading(false);
+            return;
+        }
+
         if (!speakerImageUrl) {
             toast.error("Please upload an image before submitting!");
             setLoading(false);
             return;
         }
 
-        const submissionData = { ...formData, speakerImageUrl };
-
-        if (!submissionData || Object.keys(submissionData).length === 0) {
-            toast.error("Form data is missing. Please check your inputs.");
-            setLoading(false);
-            return;
-        }
+        const submissionData = { ...formData, image: speakerImageUrl, role: "Speaker" };
 
         try {
-            console.log("Submitting data:", submissionData);
+            console.log("Submitting speaker data:", submissionData);
             const response = await registerUser(submissionData, navigate);
 
             if (response?.success) {
@@ -133,13 +138,17 @@ const CreateSpeaker = () => {
                 <h2>Register a Speaker</h2>
                 <ImageUploader onUploadSuccess={setSpeakerImageUrl} />
                 <form onSubmit={handleFormSubmit}>
-                    <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleChange} />
-                    <input type="text" name="nickname" placeholder="Nickname" value={formData.nickname} onChange={handleChange} />
-                    <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
+                    <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
+                    <input type="text" name="nickname" placeholder="Nickname" value={formData.nickname} onChange={handleChange} required />
+                    <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
                     <button className="verify-email-btn" type="button" onClick={handleVerifyEmail} disabled={!isEmailValid}>
                         {isVerifying ? "Verifying..." : "Get OTP"}
                     </button>
-                    <input type="number" name="otp" placeholder="OTP" value={formData.otp} onChange={handleChange} />
+                    <input type="number" name="otp" placeholder="OTP" value={formData.otp} onChange={handleChange} required />
+                    <select name="gender" value={formData.gender} onChange={handleGenderChange}>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
                     <div className="password-field">
                         <input
                             type={showPassword ? "text" : "password"}
@@ -147,6 +156,7 @@ const CreateSpeaker = () => {
                             placeholder="Password"
                             value={formData.password}
                             onChange={handleChange}
+                            required
                         />
                         <button type="button" className="toggle-password" onClick={() => setShowPassword((prev) => !prev)}>
                             {showPassword ? <FaEye /> : <FaEyeSlash />}
