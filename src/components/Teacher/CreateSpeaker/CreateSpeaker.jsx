@@ -8,7 +8,8 @@ import ImageUploader from "../../Common/ImageUploader.jsx";
 import "./CreateSpeaker.css";
 
 const CreateSpeaker = () => {
-    const [formData, setFormData] = useState({
+    const [form, setForm] = useState({
+        role: "Speaker",
         name: "",
         nickname: "",
         email: "",
@@ -31,7 +32,7 @@ const CreateSpeaker = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({
+        setForm((prev) => ({
             ...prev,
             [name]: value,
         }));
@@ -42,7 +43,7 @@ const CreateSpeaker = () => {
     };
 
     const handleGenderChange = (e) => {
-        setFormData((prev) => ({
+        setForm((prev) => ({
             ...prev,
             gender: e.target.value,
         }));
@@ -56,7 +57,7 @@ const CreateSpeaker = () => {
         const button = e.target;
         button.disabled = true;
 
-        const response = await verifyEmail(formData.email);
+        const response = await verifyEmail(form.email);
         if (response?.success) {
             toast.success("Verification email sent!");
         } else {
@@ -79,45 +80,41 @@ const CreateSpeaker = () => {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
-        const { name, nickname, password, about, organization } = formData;
-
-        if (!name || name.length < 3) {
+    
+        if (!form.name || form.name.length < 3) {
             toast.error("Name must be at least 3 characters long.");
             setLoading(false);
             return;
         }
-
-        if (!nickname || nickname.length < 4) {
+    
+        if (!form.nickname || form.nickname.length < 4) {
             toast.error("Nickname must be at least 4 characters long.");
             setLoading(false);
             return;
         }
-
-        if (!password || password.length < 8) {
+    
+        if (!form.password || form.password.length < 8) {
             toast.error("Password must be at least 8 characters long.");
             setLoading(false);
             return;
         }
-
-        if (!about || !organization) {
+    
+        if (!form.about || !form.organization) {
             toast.error("Please fill out 'About' and 'Organization' fields.");
             setLoading(false);
             return;
         }
-
+    
         if (!speakerImageUrl) {
             toast.error("Please upload an image before submitting!");
             setLoading(false);
             return;
         }
-
-        const submissionData = { ...formData, image: speakerImageUrl, role: "Speaker" };
-
+    
         try {
-            console.log("Submitting speaker data:", submissionData);
-            const response = await registerUser(submissionData, navigate);
-
+            console.log("Submitting speaker data:", form);
+            const response = await registerUser(e, navigate, speakerImageUrl); // Pass event correctly
+    
             if (response?.success) {
                 toast.success("Speaker registered successfully!");
                 navigate("/dashboard/speaker");
@@ -131,6 +128,7 @@ const CreateSpeaker = () => {
             setLoading(false);
         }
     };
+    
 
     return (
         <div className="user-form">
@@ -138,14 +136,14 @@ const CreateSpeaker = () => {
                 <h2>Register a Speaker</h2>
                 <ImageUploader onUploadSuccess={setSpeakerImageUrl} />
                 <form onSubmit={handleFormSubmit}>
-                    <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
-                    <input type="text" name="nickname" placeholder="Nickname" value={formData.nickname} onChange={handleChange} required />
-                    <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
+                    <input type="text" name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
+                    <input type="text" name="nickname" placeholder="Nickname" value={form.nickname} onChange={handleChange} required />
+                    <input type="email" name="email" placeholder="Email" value={form.email} onChange={handleChange} required />
                     <button className="verify-email-btn" type="button" onClick={handleVerifyEmail} disabled={!isEmailValid}>
                         {isVerifying ? "Verifying..." : "Get OTP"}
                     </button>
-                    <input type="number" name="otp" placeholder="OTP" value={formData.otp} onChange={handleChange} required />
-                    <select name="gender" value={formData.gender} onChange={handleGenderChange}>
+                    <input type="number" name="otp" placeholder="OTP" value={form.otp} onChange={handleChange} required />
+                    <select name="gender" value={form.gender} onChange={handleGenderChange}>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                     </select>
@@ -154,7 +152,7 @@ const CreateSpeaker = () => {
                             type={showPassword ? "text" : "password"}
                             name="password"
                             placeholder="Password"
-                            value={formData.password}
+                            value={form.password}
                             onChange={handleChange}
                             required
                         />
@@ -165,11 +163,11 @@ const CreateSpeaker = () => {
                     <label htmlFor="about">
                         About Speaker <span style={{ color: "red" }}>*</span>
                     </label>
-                    <textarea id="about" name="about" value={formData.about} onChange={handleChange} required></textarea>
+                    <textarea id="about" name="about" value={form.about} onChange={handleChange} required></textarea>
                     <label htmlFor="organization">
                         Organization <span style={{ color: "red" }}>*</span>
                     </label>
-                    <input type="text" id="organization" name="organization" value={formData.organization} onChange={handleChange} required />
+                    <input type="text" id="organization" name="organization" value={form.organization} onChange={handleChange} required />
                     <button type="submit" disabled={loading} className="submit-btn">
                         {loading ? "Submitting..." : "Register"}
                     </button>
