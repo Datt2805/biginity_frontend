@@ -42,6 +42,7 @@ export async function makeSecureRequest(url, method, data = {}) {
     if (method.toLowerCase() === "get") delete reqObj.body;
 
     const response = await fetch(hostSocket + url, reqObj);
+    // const response = await fetch(`${hostSocket}${url}`, reqObj);
     const obj = await response.json();
 
     if (!response.ok) throw new Error(obj.message || "some unknown error");
@@ -206,7 +207,7 @@ export const fetchUserDetail = async () => {
         if (cached?.role) return cached;
 
         const res = await makeSecureRequest("/api/auth/wmi", "GET");
-        console.log("User details fetched:", res);
+        // console.log("User details fetched:", res);
         
         setItemWithExpiry("user-details", res, 60 * 60 * 60 * 12); // 12 hours
         return res;
@@ -228,10 +229,44 @@ export const fetchEventById = async (id) => {
 // Fetch multiple speaker details by their IDs
 export const fetchSpeakersByIds = async (ids = []) => {
     const promises = ids.map(id =>
-        makeSecureRequest(`/api/users/${id}`, 'GET').catch(() => null)
+        makeSecureRequest(`/api/users/?user_id=${id}`, 'GET').catch(() => null)
     );
     const results = await Promise.all(promises);
     console.log("Speaker details fetched:", results);
     
-    return results.filter(speaker => speaker); // Filter out any failed ones
+    return results.map(res=> res.data[0] ); // Filter out any failed ones
 };
+
+export async function fetchAllUsers() {
+    try {
+        // Fetch user details to check if the logged-in user is a teacher
+        const userDetails = await fetchUserDetail();
+        if (!userDetails || userDetails.role !== "teacher") {
+            throw new Error("Unauthorized access. Only teachers can view user data.");
+        }
+
+        // Fetch all students and speakers
+        const students = await makeSecureRequest("/api/users?role=student", "GET");
+        const speakers = await makeSecureRequest("/api/users?role=speaker", "GET");
+        
+        console.log("Students:", students);
+        console.log("Speakers:", speakers);
+
+        return { students, speakers };
+    } catch (error) {
+        console.error("Error fetching users:", error.message);
+        return { students: [], speakers: [] };
+    }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Fetch all speakers
+export async function fetchSpeakersOnly() {
+    try {
+        const speakers = await makeSecureRequest("/api/users?role=speaker", "GET");
+        return speakers;
+    } catch (error) {
+        console.error("Error fetching speakers:", error.message);
+        return [];
+    }
+}

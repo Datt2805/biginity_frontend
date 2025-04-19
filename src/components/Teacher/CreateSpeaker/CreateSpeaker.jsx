@@ -8,29 +8,31 @@ import ImageUploader from "../../Common/ImageUploader.jsx";
 import "./CreateSpeaker.css";
 
 const CreateSpeaker = () => {
+    // State for    form inputs
     const [form, setForm] = useState({
-        role: "Speaker",
+        role: "Speaker", // Default role
         name: "",
         nickname: "",
         email: "",
         otp: "",
         password: "",
-        gender: "Male",
+        gender: "Male", // Default gender
         about: "",
         organization: "",
     });
 
-    
-    const [showPassword, setShowPassword] = useState(false);
-    const [speakerImageUrl, setSpeakerImageUrl] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [isEmailValid, setIsEmailValid] = useState(false);
-    const [isVerifying, setIsVerifying] = useState(false);
+    const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
+    const [speakerImageUrl, setSpeakerImageUrl] = useState(""); // Stores uploaded image URL
+    const [loading, setLoading] = useState(false); // Submission loading state
+    const [isEmailValid, setIsEmailValid] = useState(false); // Email validation state
+    const [isVerifying, setIsVerifying] = useState(false); // Email verification loading state
 
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // Navigation hook
 
+    // Function to validate email input
     const validateEmail = (emailValue) => emailValue.trim() !== "";
 
+    // Handle form input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm((prev) => ({
@@ -39,10 +41,11 @@ const CreateSpeaker = () => {
         }));
 
         if (name === "email") {
-            setIsEmailValid(validateEmail(value));
+            setIsEmailValid(validateEmail(value)); // Update email validation state
         }
     };
 
+    // Handle gender selection change
     const handleGenderChange = (e) => {
         setForm((prev) => ({
             ...prev,
@@ -50,6 +53,7 @@ const CreateSpeaker = () => {
         }));
     };
 
+    // Function to verify email and send OTP
     const handleVerifyEmail = async (event) => {
         event.preventDefault();
         if (!isEmailValid) return;
@@ -78,10 +82,12 @@ const CreateSpeaker = () => {
         }, 1000);
     };
 
+    // Function to handle form submission
     const handleFormSubmit = async (event) => {
-        event.preventDefault();
+        event.preventDefault(); // Prevent default form behavior
         setLoading(true);
     
+        // Form validation
         if (!form.name || form.name.length < 3) {
             toast.error("Name must be at least 3 characters long.");
             setLoading(false);
@@ -114,11 +120,11 @@ const CreateSpeaker = () => {
     
         try {
             console.log("Submitting speaker data:", form);
-            const response = await registerUser(form , navigate, speakerImageUrl); // Pass event correctly
+            const response = await registerUser(form, speakerImageUrl);
     
             if (response?.success) {
                 toast.success("Speaker registered successfully!");
-                navigate("/dashboard/speaker");
+                navigate("/dashboard/speaker"); // Navigate after successful registration
             } else {
                 toast.error(response?.message || "Registration failed. Please try again.");
             }
@@ -130,7 +136,6 @@ const CreateSpeaker = () => {
         }
     };
     
-
     return (
         <div className="user-form">
             <div className="form-container">
@@ -162,13 +167,9 @@ const CreateSpeaker = () => {
                             {showPassword ? <FaEye /> : <FaEyeSlash />}
                         </button>
                     </div>
-                    <label htmlFor="about">
-                        About Speaker <span style={{ color: "red" }}>*</span>
-                    </label>
+                    <label htmlFor="about">About Speaker <span style={{ color: "red" }}>*</span></label>
                     <textarea id="about" name="about" value={form.about} onChange={handleChange} required></textarea>
-                    <label htmlFor="organization">
-                        Organization <span style={{ color: "red" }}>*</span>
-                    </label>
+                    <label htmlFor="organization">Organization <span style={{ color: "red" }}>*</span></label>
                     <input type="text" id="organization" name="organization" value={form.organization} onChange={handleChange} required />
                     <button type="submit" disabled={loading} className="submit-btn">
                         {loading ? "Submitting..." : "Register"}
@@ -177,7 +178,7 @@ const CreateSpeaker = () => {
                 <ToastContainer />
             </div>
         </div>
-    );
+    );  
 };
 
 export default CreateSpeaker;

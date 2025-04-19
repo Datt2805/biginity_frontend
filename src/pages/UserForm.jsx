@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { logInUser, registerUser, verifyEmail } from "../utils/formHandlers.js";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ImageUploader from "../components/Common/ImageUploader.jsx";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./UserForm.css";
 
@@ -15,7 +14,6 @@ const UserForm = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("Student");
   const [gender, setGender] = useState("Male");
-  const [speakerImageUrl, setSpeakerImageUrl] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -48,13 +46,7 @@ const UserForm = () => {
           return;
         }
 
-        if (role === "Speaker" && !speakerImageUrl) {
-          toast.error("Please upload an image before submitting!");
-          setLoading(false);
-          return;
-        }
-
-        const response = await registerUser(event, navigate, speakerImageUrl);
+        const response = await registerUser(event, navigate);
 
         if (response?.success) {
           toast.success("Registration successful! Please log in.");
@@ -133,11 +125,6 @@ const UserForm = () => {
             Login
           </button>
         </div>
-        {role === "Speaker" && (
-          <>
-            <ImageUploader onUploadSuccess={setSpeakerImageUrl} />
-          </>
-        )}
         <form onSubmit={handleFormSubmit}>
           {formType === "register" && (
             <>
@@ -185,7 +172,6 @@ const UserForm = () => {
               <select name="role" value={role} onChange={handleRoleChange}>
                 <option value="">Select Role</option>
                 <option value="Teacher">Teacher</option>
-                <option value="Speaker">Speaker</option>
                 <option value="Student">Student</option>
               </select>
 
@@ -212,25 +198,6 @@ const UserForm = () => {
                   <option value="President">President</option>
                 </select>
               )}
-
-              {role === "Speaker" && (
-                <div className="speaker-section">
-                  {speakerImageUrl && (
-                    <div className="image-preview">
-                      <img src={speakerImageUrl} alt="Speaker Preview" width={200} />
-                    </div>
-                  )}
-                  <label htmlFor="about">
-                    About Speaker <span style={{ color: "red" }}>*</span>
-                  </label>
-                  <textarea id="about" name="about" required></textarea>
-                  <label htmlFor="organization">
-                    Organization <span style={{ color: "red" }}>*</span>
-                  </label>
-                  <input type="text" id="organization" name="organization" required />
-                </div>
-              )}
-
             </>
           )}
 
@@ -251,6 +218,7 @@ const UserForm = () => {
                 onChange={handleEmailChange}
               />
               <select name="role" value={role} onChange={handleRoleChange}>
+                <option value="">Select Role</option>
                 <option value="Teacher">Teacher</option>
                 <option value="Speaker">Speaker</option>
                 <option value="Student">Student</option>

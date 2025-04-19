@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { fetchEventById, hostSocket, fetchSpeakersByIds } from "../../../services/api";
+import { fetchEventById, hostSocket, fetchSpeakersByIds, getItemWithExpiry } from "../../../services/api";
 import "./EventDetails.css";
 import defaultPlaceholder from "../../../public/image.png";
 
@@ -9,16 +9,22 @@ const EventDetails = () => {
     const [event, setEvent] = useState(null);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
+    const isLoggedIn = Boolean(getItemWithExpiry("token"));
 
     useEffect(() => {
+        console.log(localStorage.getItem("token"));
+
         const fetchEvent = async () => {
             try {
                 setLoading(true);
                 const eventDetails = await fetchEventById(id);
                 const eventObj = eventDetails.events[0];
 
-                if (eventObj?.speaker_ids?.length && !eventObj?.speakers?.length) {
+                // Check if speaker data is missing and if the user is logged in
+                if (eventObj?.speaker_ids?.length && !eventObj?.speakers?.length && isLoggedIn) {
+                    // Fetch speaker data based on the speaker_ids
                     const speakerData = await fetchSpeakersByIds(eventObj.speaker_ids);
+                    console.log("Speaker data fetched:", speakerData);
                     eventObj.speakers = speakerData;
                 }
 
@@ -29,8 +35,9 @@ const EventDetails = () => {
                 setLoading(false);
             }
         };
+
         fetchEvent();
-    }, [id]);
+    }, [id, isLoggedIn]);
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div className="error">{error}</div>;
@@ -75,27 +82,44 @@ const EventDetails = () => {
 
             <div className="event-section">
                 <h2>Speakers</h2>
-                {event?.speakers?.length > 0 ? (
-                    <div className="speakers-grid">
-                        {event.speakers.map((speaker, index) => (
-                            <div key={index} className="speaker-card">
-                                <img
-                                    src={speaker.image?.startsWith("http") ? speaker.image : `${hostSocket}${speaker.image}`}
-                                    alt={speaker.name}
-                                    onError={(e) => (e.target.src = defaultPlaceholder)}
-                                    className="speaker-image"
-                                />
-                                <div className="speaker-info">
-                                    <strong>{speaker.name}</strong><br />
-                                    <small>{speaker.organization}</small>
-                                    <p>{speaker.about}</p>
+                {(() => {
+                    let speakersContent;
+
+                    if (isLoggedIn) {
+                        if (event?.speakers?.length > 0) {
+                            speakersContent = (
+                                <div className="speakers-grid">
+                                    {event.speakers.map((speaker) => (
+                                        <div key={speaker.id} className="speaker-card">
+                                            <img
+                                                src={speaker.profile?.startsWith("http") ? speaker.profile : `${hostSocket}${speaker.profile}`}
+                                                alt={speaker.name}
+                                                onError={(e) => (e.target.src = defaultPlaceholder)}
+                                                className="speaker-image"
+                                            />
+                                            <div className="speaker-info">
+                                                <strong>{speaker.name}</strong><br />
+                                                <small>{speaker.organization}</small>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p>No speakers available.</p>
-                )}
+                            );
+                        } else {
+                            speakersContent = <p>No speakers available.</p>;
+                        }
+                    } else {
+                        speakersContent = (
+                            <button
+                                className="see-more-btn"
+                                onClick={() => { alert("Please log in to see more details."); window.location.href = "/"; }}>
+                                See More
+                            </button>
+                        );
+                    }
+
+                    return speakersContent;
+                })()}
             </div>
         </div>
     );

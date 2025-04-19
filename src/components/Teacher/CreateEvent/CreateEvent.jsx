@@ -1,7 +1,6 @@
-// eslint-disable-next-line no-unused-vars
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import "./CreateEvent.css";
-import { createEvent } from "../../../services/api";
+import { createEvent, fetchSpeakersOnly } from "../../../services/api";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ImageUploader from "../../Common/ImageUploader";
@@ -9,6 +8,17 @@ import ImageUploader from "../../Common/ImageUploader";
 const CreateEvent = () => {
   const [loading, setLoading] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  const [selectedSpeaker, setSelectedSpeaker] = useState("");
+  const [speakers, setSpeakers] = useState([]);
+
+  useEffect(() => {
+    // Load speakers on mount
+    const loadSpeakers = async () => {
+      const result = await fetchSpeakersOnly();
+      setSpeakers(result.data || []);
+    };
+    loadSpeakers();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,6 +31,9 @@ const CreateEvent = () => {
       return;
     }
 
+    // Add selected speaker ID to formData
+    formData.append("speaker_ids", selectedSpeaker);
+
     await createEvent(
       formData,
       uploadedImageUrl,
@@ -31,36 +44,27 @@ const CreateEvent = () => {
     setLoading(false);
   };
 
-
   return (
     <div className="create-event">
       <h2>Create Event</h2>
       <ImageUploader onUploadSuccess={setUploadedImageUrl} />
       <form id="createEvent" onSubmit={handleSubmit}>
-        {/* Bhai anu css change kar j  */}  
-          <input type="checkbox" className="togglebutton-input" name="mandatory" defaultChecked/> Mandatory
-          <label className="togglebutton-label">
-          </label>
+        <input type="checkbox" className="togglebutton-input" name="mandatory" defaultChecked /> Mandatory
+        <label className="togglebutton-label"></label>
 
         <div>
-          <label htmlFor="title">
-            Title <span style={{ color: "red" }}>*</span>
-          </label>
+          <label htmlFor="title">Title <span style={{ color: "red" }}>*</span></label>
           <input type="text" id="title" name="title" required />
         </div>
 
         <fieldset>
           <legend>Description</legend>
           <div>
-            <label htmlFor="objectives">
-              Objectives <span style={{ color: "red" }}>*</span>
-            </label>
+            <label htmlFor="objectives">Objectives <span style={{ color: "red" }}>*</span></label>
             <textarea id="objectives" name="objectives" required></textarea>
           </div>
           <div>
-            <label htmlFor="learning_outcomes">
-              Learning Outcomes <span style={{ color: "red" }}>*</span>
-            </label>
+            <label htmlFor="learning_outcomes">Learning Outcomes <span style={{ color: "red" }}>*</span></label>
             <textarea id="learning_outcomes" name="learning_outcomes" required></textarea>
           </div>
         </fieldset>
@@ -75,7 +79,7 @@ const CreateEvent = () => {
           <input type="datetime-local" id="end_time" name="end_time" required />
         </div>
 
-        <fieldset>  
+        <fieldset>
           <legend>Location</legend>
           <div>
             <label htmlFor="address">Address *</label>
@@ -91,12 +95,33 @@ const CreateEvent = () => {
           </div>
         </fieldset>
 
+        {/* Dynamic Dropdown for selecting speakers */}
+        <div>
+          <label htmlFor="speaker">Speaker</label>
+          <input
+            type="text"
+            placeholder="Search Speaker"
+            value={selectedSpeaker}
+            onChange={(e) => setSelectedSpeaker(e.target.value)}
+            list="speakers"
+          />
+
+          <datalist id="speakers">
+            {speakers.map((speaker) => (
+              <option
+                key={speaker._id}
+                value={speaker.name || `${speaker.first_name} ${speaker.last_name}`}
+              />
+            ))}
+          </datalist>
+
+        </div>
 
         <button type="submit" disabled={loading}>
-    {loading ? "Uploading & Submitting..." : "Submit Event"}
-</button>
+          {loading ? "Uploading & Submitting..." : "Submit Event"}
+        </button>
       </form>
-      
+
       <ToastContainer />
     </div>
   );

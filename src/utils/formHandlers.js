@@ -64,8 +64,14 @@ export const registerUser = async (event, navigate, speakerImageUrl) => {
     localStorage.setItem("role", data.role);
 
     toast.success("Registration successful!");
-    navigate(data.role === "Teacher" ? "/TeacherDashboard" : "/StudentDashboard");
-
+    navigate(
+      data.role === "Teacher" 
+        ? "/TeacherDashboard" 
+        : data.role === "Speaker" 
+        ? "/SpeakerDashboard" 
+        : "/StudentDashboard"
+    );
+    
     return { success: true };
   } catch (err) {
     toast.error(err.message || "Something went wrong.");
@@ -97,7 +103,14 @@ export const logInUser = async (event, navigate) => {
     setItemWithExpiry("token", response.token, 15 * 86400000);
     localStorage.setItem("role", data.role);
     toast.success("Login successful! Redirecting...");
-    navigate(data.role === "Teacher" ? "/TeacherDashboard" : "/StudentDashboard");
+    navigate(
+      data.role === "Teacher" 
+        ? "/TeacherDashboard" 
+        : data.role === "Speaker" 
+        ? "/SpeakerDashboard" 
+        : "/StudentDashboard"
+    );
+    
   } catch (error) {
     toast.error("Invalid email, password, or role. Please try again."+ error);
   }
